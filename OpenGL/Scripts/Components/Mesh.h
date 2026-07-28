@@ -25,12 +25,12 @@ public:
     Mesh(Mesh&& other) noexcept = default;
     Mesh& operator=(Mesh&& other) noexcept = default;
 
-    // ---- 绘制 ----
-    void draw() const;
+    //绘制,要求有shader资源和renderer渲染器
+    void Draw(const Shader& shader, const Renderer& renderer) const;
 
-    // ---- 获取数据 ----
-    size_t getVertexCount() const { return m_vertexCount; }
-    size_t getIndexCount() const { return m_indexCount; }
+    //获取数据
+    size_t GetVertexCount() const { return m_vertexCount; }
+    size_t GetIndexCount() const { return m_indexCount; }
 
     // ---- 静态工厂方法 ----
     static std::shared_ptr<Mesh> createCube();
@@ -38,7 +38,7 @@ public:
     static std::shared_ptr<Mesh> createSphere(int segments = 24);
 
 private:
-    void setupMesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices);
+    void SetupMesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices);
 
     std::unique_ptr<VertexArray> m_vertexArray;
     std::unique_ptr<VertexBuffer> m_vertexBuffer;

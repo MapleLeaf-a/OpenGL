@@ -27,7 +27,7 @@ Mesh& Mesh::operator=(Mesh&& other) noexcept {
     return *this;
 }
 
-void Mesh::setupMesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices) {
+void Mesh::SetupMesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices) {
     m_vertexCount = vertices.size();
     m_indexCount = indices.size();
 
@@ -48,11 +48,8 @@ void Mesh::setupMesh(const std::vector<Vertex>& vertices, const std::vector<unsi
     m_vertexArray->AddBuffer(*m_vertexBuffer, layout);
 }
 
-void Mesh::draw() const {
-    if (m_VAO == 0 || m_indexCount == 0) return;
-    glBindVertexArray(m_VAO);
-    glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(m_indexCount), GL_UNSIGNED_INT, 0);
-    glBindVertexArray(0);
+void Mesh::Draw(const Shader& shader, const Renderer& renderer) const {
+    renderer.Draw(*m_vertexArray, *m_indexBuffer, shader);
 }
 
 // ---- 静态工厂方法实现 ----
