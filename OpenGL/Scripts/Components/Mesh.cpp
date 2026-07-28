@@ -6,10 +6,6 @@ Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>&
     setupMesh(vertices, indices);
 }
 
-Mesh::~Mesh() {
-    cleanup();
-}
-
 Mesh::Mesh(Mesh&& other) noexcept
     : m_VAO(other.m_VAO)
     , m_VBO(other.m_VBO)
@@ -44,48 +40,21 @@ void Mesh::setupMesh(const std::vector<Vertex>& vertices, const std::vector<unsi
     m_vertexCount = vertices.size();
     m_indexCount = indices.size();
 
-    glGenVertexArrays(1, &m_VAO);
-    glGenBuffers(1, &m_VBO);
-    glGenBuffers(1, &m_EBO);
+    //创建vertexBuffer
+    m_vertexBuffer = std::make_unique<VertexBuffer> (vertices.data(), static_cast<unsigned int>( vertices.size() * sizeof(Vertex) ));
+    
+    //创建VertexBufferLayout
+    VertexBufferLayout layout;
+    layout.Push<float>(3); //position:3个float
+    layout.Push<float>(3); //normal:3个float
+    layout.Push<float>(2); //texCoord:2个float
 
-    glBindVertexArray(m_VAO);
+    //创建indexBuffer
+    m_indexBuffer = std::make_unique<IndexBuffer> (indices.data(), static_cast<unsigned int>(indices.size()) );
 
-    // 顶点数据
-    glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), GL_STATIC_DRAW);
-
-    // 索引数据
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
-
-    // 位置 (location = 0)
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position));
-    glEnableVertexAttribArray(0);
-
-    // 法线 (location = 1)
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
-    glEnableVertexAttribArray(1);
-
-    // UV (location = 2)
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoord));
-    glEnableVertexAttribArray(2);
-
-    glBindVertexArray(0);
-}
-
-void Mesh::cleanup() {
-    if (m_VAO) {
-        glDeleteVertexArrays(1, &m_VAO);
-        m_VAO = 0;
-    }
-    if (m_VBO) {
-        glDeleteBuffers(1, &m_VBO);
-        m_VBO = 0;
-    }
-    if (m_EBO) {
-        glDeleteBuffers(1, &m_EBO);
-        m_EBO = 0;
-    }
+    //创建vertexArray
+    m_vertexArray = std::make_unique<VertexArray> ();
+    m_vertexArray->AddBuffer(*m_vertexBuffer, layout);
 }
 
 void Mesh::draw() const {

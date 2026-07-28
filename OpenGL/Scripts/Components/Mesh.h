@@ -1,9 +1,12 @@
+// Mesh.hpp
 #pragma once
 #include <vector>
 #include <memory>
-// #include <glad/glad.h>
-#include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
+#include "VertexArray.h"
+#include "VertexBuffer.h"
+#include "IndexBuffer.h"
+#include "VertexBufferLayout.h"
+#include <glm/glm.hpp>
 
 struct Vertex {
     glm::vec3 position;
@@ -14,15 +17,13 @@ struct Vertex {
 class Mesh {
 public:
     Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices);
-    ~Mesh();
+    ~Mesh() = default;
 
-    //禁止拷贝（OpenGL对象不能简单拷贝）
+    //禁止拷贝，允许移动
     Mesh(const Mesh&) = delete;
     Mesh& operator=(const Mesh&) = delete;
-
-    //允许移动
-    Mesh(Mesh&& other) noexcept;
-    Mesh& operator=(Mesh&& other) noexcept;
+    Mesh(Mesh&& other) noexcept = default;
+    Mesh& operator=(Mesh&& other) noexcept = default;
 
     // ---- 绘制 ----
     void draw() const;
@@ -38,11 +39,10 @@ public:
 
 private:
     void setupMesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices);
-    void cleanup();
 
-    unsigned int m_VAO = 0;
-    unsigned int m_VBO = 0;
-    unsigned int m_EBO = 0;
+    std::unique_ptr<VertexArray> m_vertexArray;
+    std::unique_ptr<VertexBuffer> m_vertexBuffer;
+    std::unique_ptr<IndexBuffer> m_indexBuffer;
     size_t m_vertexCount = 0;
     size_t m_indexCount = 0;
 };
