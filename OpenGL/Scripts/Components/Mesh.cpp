@@ -7,31 +7,22 @@ Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>&
 }
 
 Mesh::Mesh(Mesh&& other) noexcept
-    : m_VAO(other.m_VAO)
-    , m_VBO(other.m_VBO)
-    , m_EBO(other.m_EBO)
-    , m_vertexCount(other.m_vertexCount)
-    , m_indexCount(other.m_indexCount) {
-    other.m_VAO = 0;
-    other.m_VBO = 0;
-    other.m_EBO = 0;
+    : m_vertexArray(std::move(other.m_vertexArray)),
+      m_vertexBuffer(std::move(other.m_vertexBuffer)),
+      m_indexBuffer(std::move(other.m_indexBuffer)),
+      m_vertexCount(other.m_vertexCount),
+      m_indexCount(other.m_indexCount) {
     other.m_vertexCount = 0;
     other.m_indexCount = 0;
 }
 
 Mesh& Mesh::operator=(Mesh&& other) noexcept {
     if (this != &other) {
-        cleanup();
-        m_VAO = other.m_VAO;
-        m_VBO = other.m_VBO;
-        m_EBO = other.m_EBO;
+        m_vertexArray = std::move(other.m_vertexArray);
+        m_vertexBuffer = std::move(other.m_vertexBuffer);
+        m_indexBuffer = std::move(other.m_indexBuffer);
         m_vertexCount = other.m_vertexCount;
         m_indexCount = other.m_indexCount;
-        other.m_VAO = 0;
-        other.m_VBO = 0;
-        other.m_EBO = 0;
-        other.m_vertexCount = 0;
-        other.m_indexCount = 0;
     }
     return *this;
 }
