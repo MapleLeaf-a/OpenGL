@@ -1,0 +1,69 @@
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# Visual Studio 相关
+.vs/
+Debug/
+Release/
+x64/
+OpenGL/x64/
+OpenGL/Debug/
+OpenGL/Release/
+
+# 编译产物
+*.exe
+*.pdb
+*.ilk
+*.log
+*.tlog
+*.idb
+*.recipe
+*.lastbuildstate
+
+# 用户配置文件
+*.user
+*.suo
+*.VC.db
+*.VC.VC.opendb
+*.ipch
+*.db-shm
+*.db-wal
+*.filters
+*.vcxproj.user
+DocumentLayout.json
+DocumentLayout.backup.json
+fileList.bin
+
+# 其他
+imgui.ini
+vc140.pdb
