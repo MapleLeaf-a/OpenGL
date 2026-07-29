@@ -7,32 +7,32 @@ Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>&
 }
 
 Mesh::Mesh(Mesh&& other) noexcept
-    : m_vertexArray(std::move(other.m_vertexArray)),
-      m_vertexBuffer(std::move(other.m_vertexBuffer)),
-      m_indexBuffer(std::move(other.m_indexBuffer)),
-      m_vertexCount(other.m_vertexCount),
-      m_indexCount(other.m_indexCount) {
-    other.m_vertexCount = 0;
-    other.m_indexCount = 0;
+    : m_VertexArray(std::move(other.m_VertexArray)),
+      m_VertexBuffer(std::move(other.m_VertexBuffer)),
+      m_IndexBuffer(std::move(other.m_IndexBuffer)),
+      m_VertexCount(other.m_VertexCount),
+      m_IndexCount(other.m_IndexCount) {
+    other.m_VertexCount = 0;
+    other.m_IndexCount = 0;
 }
 
 Mesh& Mesh::operator=(Mesh&& other) noexcept {
     if (this != &other) {
-        m_vertexArray = std::move(other.m_vertexArray);
-        m_vertexBuffer = std::move(other.m_vertexBuffer);
-        m_indexBuffer = std::move(other.m_indexBuffer);
-        m_vertexCount = other.m_vertexCount;
-        m_indexCount = other.m_indexCount;
+        m_VertexArray = std::move(other.m_VertexArray);
+        m_VertexBuffer = std::move(other.m_VertexBuffer);
+        m_IndexBuffer = std::move(other.m_IndexBuffer);
+        m_VertexCount = other.m_VertexCount;
+        m_IndexCount = other.m_IndexCount;
     }
     return *this;
 }
 
 void Mesh::SetupMesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices) {
-    m_vertexCount = vertices.size();
-    m_indexCount = indices.size();
+    m_VertexCount = vertices.size();
+    m_IndexCount = indices.size();
 
     //创建vertexBuffer
-    m_vertexBuffer = std::make_unique<VertexBuffer> (vertices.data(), static_cast<unsigned int>( vertices.size() * sizeof(Vertex) ));
+    m_VertexBuffer = std::make_unique<VertexBuffer> (vertices.data(), static_cast<unsigned int>( vertices.size() * sizeof(Vertex) ));
     
     //创建VertexBufferLayout
     VertexBufferLayout layout;
@@ -41,15 +41,15 @@ void Mesh::SetupMesh(const std::vector<Vertex>& vertices, const std::vector<unsi
     layout.Push<float>(2); //texCoord:2个float
 
     //创建indexBuffer
-    m_indexBuffer = std::make_unique<IndexBuffer> (indices.data(), static_cast<unsigned int>(indices.size()) );
+    m_IndexBuffer = std::make_unique<IndexBuffer> (indices.data(), static_cast<unsigned int>(indices.size()) );
 
     //创建vertexArray
-    m_vertexArray = std::make_unique<VertexArray> ();
-    m_vertexArray->AddBuffer(*m_vertexBuffer, layout);
+    m_VertexArray = std::make_unique<VertexArray> ();
+    m_VertexArray->AddBuffer(*m_VertexBuffer, layout);
 }
 
 void Mesh::Draw(const Shader& shader, const Renderer& renderer) const {
-    renderer.Draw(*m_vertexArray, *m_indexBuffer, shader);
+    renderer.Draw(*m_VertexArray, *m_IndexBuffer, shader);
 }
 
 // ---- 静态工厂方法实现 ----

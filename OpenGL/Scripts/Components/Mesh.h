@@ -30,8 +30,8 @@ public:
     void Draw(const Shader& shader, const Renderer& renderer) const;
 
     //获取数据
-    size_t GetVertexCount() const { return m_vertexCount; }
-    size_t GetIndexCount() const { return m_indexCount; }
+    size_t GetVertexCount() const { return m_VertexCount; }
+    size_t GetIndexCount() const { return m_IndexCount; }
 
     // ---- 静态工厂方法 ----
     static std::shared_ptr<Mesh> CreateCube();
@@ -41,9 +41,9 @@ public:
 private:
     void SetupMesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices);
 
-    std::unique_ptr<VertexArray> m_vertexArray;
-    std::unique_ptr<VertexBuffer> m_vertexBuffer;
-    std::unique_ptr<IndexBuffer> m_indexBuffer;
-    size_t m_vertexCount = 0;
-    size_t m_indexCount = 0;
+    std::unique_ptr<VertexArray> m_VertexArray;
+    std::unique_ptr<VertexBuffer> m_VertexBuffer;
+    std::unique_ptr<IndexBuffer> m_IndexBuffer;
+    size_t m_VertexCount = 0;
+    size_t m_IndexCount = 0;
 };
