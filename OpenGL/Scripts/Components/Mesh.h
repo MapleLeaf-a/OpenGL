@@ -6,7 +6,8 @@
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
 #include "VertexBufferLayout.h"
-#include <glm/glm.hpp>
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
 
 struct Vertex {
     glm::vec3 position;
@@ -33,9 +34,9 @@ public:
     size_t GetIndexCount() const { return m_indexCount; }
 
     // ---- 静态工厂方法 ----
-    static std::shared_ptr<Mesh> createCube();
-    static std::shared_ptr<Mesh> createPlane(float size = 5.0f);
-    static std::shared_ptr<Mesh> createSphere(int segments = 24);
+    static std::shared_ptr<Mesh> CreateCube();
+    static std::shared_ptr<Mesh> CreatePlane(float size = 5.0f);
+    static std::shared_ptr<Mesh> CreateSphere(int segments = 24);
 
 private:
     void SetupMesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices);

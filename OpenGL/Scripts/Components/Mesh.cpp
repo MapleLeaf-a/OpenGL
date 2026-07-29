@@ -3,7 +3,7 @@
 #include <cmath>
 
 Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices) {
-    setupMesh(vertices, indices);
+    SetupMesh(vertices, indices);
 }
 
 Mesh::Mesh(Mesh&& other) noexcept
@@ -54,7 +54,7 @@ void Mesh::Draw(const Shader& shader, const Renderer& renderer) const {
 
 // ---- 静态工厂方法实现 ----
 
-std::shared_ptr<Mesh> Mesh::createCube() {
+std::shared_ptr<Mesh> Mesh::CreateCube() {
     // 6个面，每个面4个顶点，共24个顶点
     std::vector<Vertex> vertices = {
         // 前面 (Z+)
@@ -102,7 +102,7 @@ std::shared_ptr<Mesh> Mesh::createCube() {
     return std::make_shared<Mesh>(vertices, indices);
 }
 
-std::shared_ptr<Mesh> Mesh::createPlane(float size) {
+std::shared_ptr<Mesh> Mesh::CreatePlane(float size) {
     float half = size * 0.5f;
     std::vector<Vertex> vertices = {
         {{-half, 0.0f, -half}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
@@ -114,7 +114,7 @@ std::shared_ptr<Mesh> Mesh::createPlane(float size) {
     return std::make_shared<Mesh>(vertices, indices);
 }
 
-std::shared_ptr<Mesh> Mesh::createSphere(int segments) {
+std::shared_ptr<Mesh> Mesh::CreateSphere(int segments) {  //UV Sphere,利用球面坐标来生成球体的Mesh
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
 
