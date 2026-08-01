@@ -72,6 +72,7 @@ int main(void)
     (GL_ONE_MINUS_DST_COLOR, GL_ONE)	    src*(1-dst) + dst*1	屏幕混合（高光）*/
 
     std::shared_ptr<Mesh> cubeMesh = Mesh::CreateCube();
+    std::shared_ptr<Mesh> planeMesh = Mesh::CreatePlane(10.0f);
 
     GameObject mainCamera("MainCamera");
     mainCamera.GetTransform().SetPosition(glm::vec3(0.0f, 1.0f, 5.0f));
@@ -130,6 +131,7 @@ int main(void)
         shader.SetUniformMat4f("u_MVP", u_MVP);
 
         cubeMesh->Draw(shader, renderer);
+        planeMesh->Draw(shader, renderer);
 
         Transform& camTransform = mainCamera.GetTransform();
 
