@@ -89,7 +89,7 @@ int main(void)
     shader.Bind();
 
     std::string name_U4f = "u_Color";
-    shader.SetUniform4f(name_U4f, 0.0f, 0.0f, 0.0f, 1.0f);
+    shader.SetUniform4f(name_U4f, 0.5f, 0.5f, 0.5f, 1.0f);
 
     Texture texture("../Resources/Textures/2.png");
     unsigned int slot = 0;
@@ -131,7 +131,7 @@ int main(void)
         shader.SetUniformMat4f("u_MVP", u_MVP);
 
         cubeMesh->Draw(shader, renderer);
-        planeMesh->Draw(shader, renderer);
+        // planeMesh->Draw(shader, renderer);
 
         Transform& camTransform = mainCamera.GetTransform();
 
