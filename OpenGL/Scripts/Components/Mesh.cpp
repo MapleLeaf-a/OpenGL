@@ -6,27 +6,6 @@ Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>&
     SetupMesh(vertices, indices);
 }
 
-Mesh::Mesh(Mesh&& other) noexcept
-    : m_VertexArray(std::move(other.m_VertexArray)),
-      m_VertexBuffer(std::move(other.m_VertexBuffer)),
-      m_IndexBuffer(std::move(other.m_IndexBuffer)),
-      m_VertexCount(other.m_VertexCount),
-      m_IndexCount(other.m_IndexCount) {
-    other.m_VertexCount = 0;
-    other.m_IndexCount = 0;
-}
-
-Mesh& Mesh::operator=(Mesh&& other) noexcept {
-    if (this != &other) {
-        m_VertexArray = std::move(other.m_VertexArray);
-        m_VertexBuffer = std::move(other.m_VertexBuffer);
-        m_IndexBuffer = std::move(other.m_IndexBuffer);
-        m_VertexCount = other.m_VertexCount;
-        m_IndexCount = other.m_IndexCount;
-    }
-    return *this;
-}
-
 void Mesh::SetupMesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices) {
     m_VertexCount = vertices.size();
     m_IndexCount = indices.size();
@@ -40,12 +19,12 @@ void Mesh::SetupMesh(const std::vector<Vertex>& vertices, const std::vector<unsi
     layout.Push<float>(3); //normal:3个float
     layout.Push<float>(2); //texCoord:2个float
 
-    //创建indexBuffer
-    m_IndexBuffer = std::make_unique<IndexBuffer> (indices.data(), static_cast<unsigned int>(indices.size()) );
-
-    //创建vertexArray
+    //创建vertexArray,注意顺序,让VAO记住EBO(IBO)
     m_VertexArray = std::make_unique<VertexArray> ();
     m_VertexArray->AddBuffer(*m_VertexBuffer, layout);
+
+    //创建indexBuffer
+    m_IndexBuffer = std::make_unique<IndexBuffer> (indices.data(), static_cast<unsigned int>(indices.size()) );
 }
 
 void Mesh::Draw(const Shader& shader, const Renderer& renderer) const {

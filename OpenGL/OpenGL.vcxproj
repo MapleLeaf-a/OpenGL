@@ -102,7 +102,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>GLEW_STATIC</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GLEW\include;Scripts\vendor;Scripts;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GLEW\include;Scripts\vendor;Scripts;Scripts/Components;D:\计算机图形学\OpenGL\OpenGL%28Manually%29\OpenGL\Scripts\GameObjects;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -119,7 +119,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>GLEW_STATIC</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GLEW\include;Scripts\vendor;Scripts;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GLEW\include;Scripts\vendor;Scripts;Scripts/Components;D:\计算机图形学\OpenGL\OpenGL%28Manually%29\OpenGL\Scripts\GameObjects;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -129,6 +129,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Scripts\Components\Component.cpp" />
+    <ClCompile Include="Scripts\Components\Mesh.cpp" />
     <ClCompile Include="Scripts\IndexBuffer.cpp" />
     <ClCompile Include="Scripts\Main(abstract).cpp" />
     <ClCompile Include="Scripts\Main.cpp" />
@@ -153,6 +155,9 @@
     <ClCompile Include="Scripts\Components\Transform.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Scripts\Components\CameraComponent.h" />
+    <ClInclude Include="Scripts\Components\Component.h" />
+    <ClInclude Include="Scripts\Components\Mesh.h" />
     <ClInclude Include="Scripts\IndexBuffer.h" />
     <ClInclude Include="Scripts\Renderer.h" />
     <ClInclude Include="Scripts\Shader.h" />
