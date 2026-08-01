@@ -28,8 +28,46 @@ public:
         m_ProjDirty = true;
     }
 
+    glm::mat4 GetViewMatrix() const 
+    {
+        Transform* transform = GetTransform();
+        if (!transform) return glm::mat4(1.0f); //如果没有Transform组件,返回单位矩阵
+        
+        glm::vec3 pos = transform->GetPosition();
+        glm::vec3 forward = transform->GetForward();
+        glm::vec3 up = transform->GetUp();
+
+        return glm::lookAt(pos, pos + forward, up);
+    }
+
+    glm::mat4 GetProjectionMatrix()
+    {
+        if (m_ProjDirty)
+        {
+            UpdateProjectionMatrix();
+            m_ProjDirty = false;
+        }
+        return m_ProjectionMatrix;
+    }
+
+    glm::mat4 GetViewProjectionMatrix()
+    {
+        return GetProjectionMatrix() * GetViewMatrix();
+    }
 
 private:
+    void UpdateProjectionMatrix()
+    {
+        if (m_IsPerspective)
+        {
+            m_ProjectionMatrix = glm::perspective(glm::radians(m_Fov), m_AspectRatio, m_NearPlane, m_FarPlane);
+        }
+        else
+        {
+            m_ProjectionMatrix = glm::ortho(m_Left, m_Right, m_Bottom, m_Top, m_NearPlane, m_FarPlane);
+        }
+    }
+
     //是否是透视投影
     bool m_IsPerspective = true;
 
@@ -43,6 +81,8 @@ private:
     
     float m_NearPlane = 0.1f;
     float m_FarPlane = 100.0f;
+
+    glm::mat4 m_ProjectionMatrix = glm::mat4(1.0f);
 
     bool m_ProjDirty = true;    
 };
