@@ -88,7 +88,7 @@ int main(void)
     shader.Bind();
 
     std::string name_U4f = "u_Color";
-    shader.SetUniform4f(name_U4f, 1.0f, 0.0f, 0.0f, 1.0f);
+    shader.SetUniform4f(name_U4f, 0.0f, 0.0f, 0.0f, 1.0f);
 
     Texture texture("../Resources/Textures/2.png");
     unsigned int slot = 0;
@@ -131,9 +131,33 @@ int main(void)
 
         cubeMesh->Draw(shader, renderer);
 
+        Transform& camTransform = mainCamera.GetTransform();
+
         {
+            ImGui::Begin("Camera Transform");
+            
             ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
             
+            // ---- 位置控制 ----
+            ImGui::Text("Position");
+            glm::vec3 pos = camTransform.GetPosition();
+            if (ImGui::DragFloat3("Pos", &pos.x, 0.1f)) {
+                camTransform.SetPosition(pos);
+            }
+            // ---- 旋转控制（欧拉角） ----
+            ImGui::Text("Rotation (degrees)");
+            glm::vec3 rot = camTransform.GetEulerAngles();
+            if (ImGui::DragFloat3("Rot", &rot.x, 0.5f, -180.0f, 180.0f)) {
+                camTransform.SetRotation(rot);
+            }
+            // ---- 缩放控制 ----
+            ImGui::Text("Scale");
+            glm::vec3 scale = camTransform.GetScale();
+            if (ImGui::DragFloat3("Scale", &scale.x, 0.1f, 0.01f, 10.0f)) {
+                camTransform.SetScale(scale);
+            }
+
+            ImGui::End();
         }
 
         ImGui::Render();
