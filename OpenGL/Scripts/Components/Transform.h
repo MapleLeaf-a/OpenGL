@@ -34,8 +34,8 @@ public:
 		m_Rotation = quat;
 		m_Dirty = true;
 	}
-	//获取欧拉角
-	const glm::vec3& GetEulerAngles() const { return glm::degrees( glm::eulerAngles(m_Rotation) ); }
+	//获取欧拉角,因为是临时局部变量不能返回引用,只能拷贝
+	glm::vec3 GetEulerAngles() const { return glm::degrees( glm::eulerAngles(m_Rotation) ); }
 
 	//设置Scale
 	void SetScale(const glm::vec3& scale) 
