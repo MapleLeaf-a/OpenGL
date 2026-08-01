@@ -24,6 +24,8 @@
 #include "Component.h"
 #include "CameraComponent.h"
 #include "Mesh.h"
+#include "Material.h"
+#include "MeshRenderer.h"
 
 int main(void)
 {
@@ -71,9 +73,7 @@ int main(void)
     (GL_ZERO, GL_SRC_COLOR)             	src*0 + dst*src	    正片叠底（阴影）
     (GL_ONE_MINUS_DST_COLOR, GL_ONE)	    src*(1-dst) + dst*1	屏幕混合（高光）*/
 
-    std::shared_ptr<Mesh> cubeMesh = Mesh::CreateCube();
-    std::shared_ptr<Mesh> planeMesh = Mesh::CreatePlane(10.0f);
-
+    //相机相关
     GameObject mainCamera("MainCamera");
     mainCamera.GetTransform().SetPosition(glm::vec3(0.0f, 1.0f, 5.0f));
 
@@ -81,6 +81,16 @@ int main(void)
     cameraComp->SetPerspective(45.0f, 16.0f / 9.0f, 0.1f, 100.0f);
 
 
+    //GO相关
+    std::shared_ptr<Mesh> cubeMesh = Mesh::CreateCube();
+    std::shared_ptr<Mesh> planeMesh = Mesh::CreatePlane(10.0f);
+    std::shared_ptr<Material> cubeMaterial = std::make_shared<Material>(glm::vec3(1.0f, 0.0f, 0.0f), 0.5f, 0.1f);
+
+    GameObject cube("Cube");
+    MeshRenderer* cubeRenderer = cube.AddComponent<MeshRenderer>(cubeMesh, cubeMaterial);
+    cube.GetTransform().SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+
+    //着色器相关
     std::string vertFilePath = "Shaders/vert.shader";
     std::string fragFilePath = "Shaders/frag.shader";
 
@@ -88,13 +98,13 @@ int main(void)
 
     shader.Bind();
 
-    std::string name_U4f = "u_Color";
-    shader.SetUniform4f(name_U4f, 0.5f, 0.5f, 0.5f, 1.0f);
+    // std::string name_U4f = "u_Color";
+    // shader.SetUniform4f(name_U4f, 0.5f, 0.5f, 0.5f, 1.0f);
 
-    Texture texture("../Resources/Textures/2.png");
-    unsigned int slot = 0;
-    texture.Bind(slot);
-    shader.SetUniform1i("u_Texture", slot);
+    // Texture texture("../Resources/Textures/2.png");
+    // unsigned int slot = 0;
+    // texture.Bind(slot);
+    // shader.SetUniform1i("u_Texture", slot);
 
     shader.Unbind(); //清理绑定状态，防止后续不小心使用
 
@@ -126,12 +136,12 @@ int main(void)
 
         glm::mat4 proj = cameraComp->GetProjectionMatrix();
         glm::mat4 view = cameraComp->GetViewMatrix();
-        glm::mat4 model = glm::mat4(1.0f);
-        glm::mat4 u_MVP = proj * view * model;
-        shader.SetUniformMat4f("u_MVP", u_MVP);
+        glm::mat4 model = glm::mat4(1.0f); //单位矩阵
+        shader.SetUniformMat4f("u_Model", model);
+        shader.SetUniformMat4f("u_View", view);
+        shader.SetUniformMat4f("u_Projection", proj);
 
-        cubeMesh->Draw(shader, renderer);
-        // planeMesh->Draw(shader, renderer);
+        cubeRenderer->Render(shader, renderer);       
 
         Transform& camTransform = mainCamera.GetTransform();
 

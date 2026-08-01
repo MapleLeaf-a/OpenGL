@@ -74,7 +74,8 @@ public:
     }
 
 private:
-	 void UpdateModelMatrix() {
+	void UpdateModelMatrix() 
+	{
         glm::mat4 translation = glm::translate(glm::mat4(1.0f), m_Position);
         glm::mat4 rotation = glm::mat4_cast(m_Rotation); //将四元数转换成4*4矩阵,有具体的数学公式,不需要再调用sin cos计算,效率更高
 		glm::mat4 scale = glm::scale(glm::mat4(1.0f), m_Scale);

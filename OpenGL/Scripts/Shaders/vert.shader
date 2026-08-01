@@ -1,14 +1,24 @@
 #version 330 core
 
-layout(location = 0) in vec4 position; //顶点着色器输入声明,声明一个名为 position的4分量浮点向量输入变量,并将其绑定到位置索引0,用于接收来自CPU的顶点数据
-layout(location = 1) in vec2 texCoord;
+layout(location = 0) in vec3 position;
+layout(location = 1) in vec3 normal;
+layout(location = 2) in vec2 texCoord;
 
+uniform mat4 u_Model;
+uniform mat4 u_View;
+uniform mat4 u_Projection;
+
+out vec3 v_Pos;
+out vec3 v_Normal;
 out vec2 v_TexCoord; //(v代表Varing)通过Varing将顶点着色器传递到片段着色器
-
-uniform mat4 u_MVP; //4*4的MVP矩阵
 
 void main()
 {
-    gl_Position = u_MVP * position;
+    vec4 worldPos = u_Model * vec4(position, 1.0);
+    v_Pos = worldPos.xyz;
+
+    v_Normal = mat3(transpose(inverse(u_Model))) * normal; //使用Model的转置逆矩阵
     v_TexCoord = texCoord;
+
+    gl_Position = u_Projection * u_View * worldPos;
 }

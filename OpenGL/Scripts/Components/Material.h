@@ -5,6 +5,10 @@
 
 class Material{
 public:
+    Material() = default;
+    Material(glm::vec3 albedo, float roughness, float metallic)
+        : m_Albedo(albedo), m_Roughness(roughness), m_Metallic(metallic) {}
+
     void SetAlbedo(const glm::vec3& color) { m_Albedo = color; }
     void SetRoughness(float roughness) { m_Roughness = roughness; }
     void SetMetallic(float metallic) { m_Metallic = metallic; }
@@ -12,7 +16,7 @@ public:
     //将材质属性应用到着色器中
     void Apply(Shader& shader) const
     {
-        shader.SetUniform4f("u_Color", m_Albedo.r, m_Albedo.g, m_Albedo.b, 1.0f);
+        shader.SetUniform4f("u_Albedo", m_Albedo.r, m_Albedo.g, m_Albedo.b, 1.0f);
         shader.SetUniform1f("u_Roughness", m_Roughness);
         shader.SetUniform1f("u_Metallic", m_Metallic);
     }
