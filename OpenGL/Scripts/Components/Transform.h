@@ -9,7 +9,17 @@ class Transform
 public:
 	Transform() : m_Position(0.0f),
 	 m_Rotation(glm::quat(1.0f, 0.0f, 0.0f, 0.0f)),
-	 m_Scale(1.0f) {}
+	 m_Scale(1.0f) { UpdateModelMatrix(); }
+
+	Transform(const glm::vec3& position, const glm::quat& quaternion, const glm::vec3& scale)
+		: m_Position(position), m_Rotation(quaternion), m_Scale(scale) { UpdateModelMatrix(); }
+
+	Transform(const glm::vec3& position, const glm::vec3& eulerDegrees, const glm::vec3& scale)
+		: m_Position(position), m_Scale(scale) 
+	{
+		SetRotation(eulerDegrees); //用欧拉角设置旋转
+		UpdateModelMatrix();
+	}
 
 	//设置位置
 	void SetPosition(const glm::vec3& pos)

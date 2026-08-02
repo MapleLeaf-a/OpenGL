@@ -47,7 +47,7 @@ int main(void)
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
 
-    glfwSwapInterval(1);//设置垂直同步（V-Sync，垂直同步）的函数。它的作用是：控制屏幕刷新率与帧率之间的同步关系。
+    glfwSwapInterval(0);//设置垂直同步（V-Sync，垂直同步）的函数。它的作用是：控制屏幕刷新率与帧率之间的同步关系。
     /*参数值	含义	效果
         0	关闭 V-Sync	帧率不受限制，GPU 全力渲染
         1	开启 V-Sync	帧率与屏幕刷新率同步（如 60Hz 显示器 = 60 FPS）
@@ -75,7 +75,7 @@ int main(void)
 
     //相机相关
     GameObject mainCamera("MainCamera");
-    mainCamera.GetTransform().SetPosition(glm::vec3(0.0f, 1.0f, 5.0f));
+    mainCamera.GetTransform().SetPosition(glm::vec3(0.0f, 1.0f, 10.0f));
 
     CameraComponent* cameraComp = mainCamera.AddComponent<CameraComponent>();
     cameraComp->SetPerspective(45.0f, 16.0f / 9.0f, 0.1f, 100.0f);
@@ -88,7 +88,11 @@ int main(void)
 
     GameObject cube("Cube");
     MeshRenderer* cubeRenderer = cube.AddComponent<MeshRenderer>(cubeMesh, cubeMaterial);
-    cube.GetTransform().SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+    cube.GetTransform().SetPosition(glm::vec3(1.0f, 2.0f, 5.0f));
+
+    GameObject plane("Plane");
+    MeshRenderer* planeRenderer = plane.AddComponent<MeshRenderer>(planeMesh, std::make_shared<Material>(glm::vec3(0.5f, 0.5f, 0.5f), 0.8f, 0.0f));
+    plane.GetTransform().SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 
     //着色器相关
     std::string vertFilePath = "Shaders/vert.shader";
@@ -136,12 +140,11 @@ int main(void)
 
         glm::mat4 proj = cameraComp->GetProjectionMatrix();
         glm::mat4 view = cameraComp->GetViewMatrix();
-        glm::mat4 model = glm::mat4(1.0f); //单位矩阵
-        shader.SetUniformMat4f("u_Model", model);
         shader.SetUniformMat4f("u_View", view);
         shader.SetUniformMat4f("u_Projection", proj);
 
         cubeRenderer->Render(shader, renderer);       
+        planeRenderer->Render(shader, renderer);
 
         Transform& camTransform = mainCamera.GetTransform();
 
