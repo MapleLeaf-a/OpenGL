@@ -47,7 +47,7 @@ int main(void)
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
 
-    glfwSwapInterval(0);//设置垂直同步（V-Sync，垂直同步）的函数。它的作用是：控制屏幕刷新率与帧率之间的同步关系。
+    glfwSwapInterval(1);//设置垂直同步（V-Sync，垂直同步）的函数。它的作用是：控制屏幕刷新率与帧率之间的同步关系。
     /*参数值	含义	效果
         0	关闭 V-Sync	帧率不受限制，GPU 全力渲染
         1	开启 V-Sync	帧率与屏幕刷新率同步（如 60Hz 显示器 = 60 FPS）
@@ -80,11 +80,12 @@ int main(void)
     CameraComponent* cameraComp = mainCamera.AddComponent<CameraComponent>();
     cameraComp->SetPerspective(45.0f, 16.0f / 9.0f, 0.1f, 100.0f);
 
+    // mainCamera.GetTransform().SetRotation(glm::vec3(0.0f, -90.0f, 0.0f));
 
     //GO相关
     std::shared_ptr<Mesh> cubeMesh = Mesh::CreateCube();
     std::shared_ptr<Mesh> planeMesh = Mesh::CreatePlane(10.0f);
-    std::shared_ptr<Material> cubeMaterial = std::make_shared<Material>(glm::vec3(1.0f, 0.0f, 0.0f), 0.5f, 0.1f);
+    std::shared_ptr<Material> cubeMaterial = std::make_shared<Material>(glm::vec3(0.6f, 0.6f, 0.6f), 0.5f, 0.1f);
 
     GameObject cube("Cube");
     MeshRenderer* cubeRenderer = cube.AddComponent<MeshRenderer>(cubeMesh, cubeMaterial);
@@ -120,7 +121,13 @@ int main(void)
     ImGui::StyleColorsDark();
     ImGui_ImplOpenGL3_Init();
 
-
+    float lastX = 0.0f;
+    float lastY = 0.0f;
+    float lastZ = 0.0f;
+    float x = 0.0f;
+    float y = 0.0f;
+    float z = 0.0f;
+    
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {
@@ -156,19 +163,43 @@ int main(void)
             // ---- 位置控制 ----
             ImGui::Text("Position");
             glm::vec3 pos = camTransform.GetPosition();
-            if (ImGui::DragFloat3("Pos", &pos.x, 0.1f)) {
+            if (ImGui::DragFloat3("##Pos", &pos.x, 0.1f)) {
                 camTransform.SetPosition(pos);
             }
-            // ---- 旋转控制（欧拉角） ----
-            ImGui::Text("Rotation (degrees)");
-            glm::vec3 rot = camTransform.GetEulerAngles();
-            if (ImGui::DragFloat3("Rot", &rot.x, 0.5f, -180.0f, 180.0f)) {
-                camTransform.SetRotation(rot);
+            // ---- 旋转控制 ----
+            ImGui::Text("Rotation");
+
+            float itemWidth = 75.0f;  // 每个滑块的宽度
+            ImGui::PushItemWidth(itemWidth);
+
+            // Pitch
+            if (ImGui::DragFloat("##Pitch", &x, 0.1f, -180, 180))
+            {
+                camTransform.Rotate(glm::vec3(1, 0, 0), x - lastX);
+                lastX = x;
             }
+            ImGui::SameLine();
+
+            // Yaw
+            if (ImGui::DragFloat("##Yaw", &y, 0.1f, -180, 180))
+            {
+                camTransform.Rotate(glm::vec3(0, 1, 0), y - lastY);
+                lastY = y;
+            }
+            ImGui::SameLine();
+
+            // Roll
+            if (ImGui::DragFloat("##Roll", &z, 0.1f, -180, 180))
+            {
+                camTransform.Rotate(glm::vec3(0, 0, 1), z - lastZ);
+                lastZ = z;
+            }
+
+            ImGui::PopItemWidth();
             // ---- 缩放控制 ----
             ImGui::Text("Scale");
             glm::vec3 scale = camTransform.GetScale();
-            if (ImGui::DragFloat3("Scale", &scale.x, 0.1f, 0.01f, 10.0f)) {
+            if (ImGui::DragFloat3("##Scale", &scale.x, 0.1f, 0.01f, 10.0f)) {
                 camTransform.SetScale(scale);
             }
 

@@ -83,6 +83,19 @@ public:
         return m_modelMatrix;
     }
 
+	//用四元数旋转
+	void Rotate(const glm::quat& quat)
+	{
+		m_Rotation = quat * m_Rotation;
+		m_Dirty = true;
+	}
+	//用轴角旋转
+	void Rotate(const glm::vec3& axis, float angleDegrees)
+	{
+		glm::quat quat = glm::angleAxis(glm::radians(angleDegrees), glm::normalize(axis));
+		Rotate(quat);
+	}
+
 private:
 	void UpdateModelMatrix() 
 	{
