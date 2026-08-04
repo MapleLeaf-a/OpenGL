@@ -37,7 +37,8 @@ Renderer::~Renderer()
 
 void Renderer::Clear() const
 {
-    GLCall(glClear(GL_COLOR_BUFFER_BIT)); //清空屏幕（颜色缓冲区）的命令，把当前帧缓冲中的所有像素设置为预设的"清除颜色"，相当于"擦黑板"
+    //同时清除颜色缓冲和深度缓冲:若不清理深度,上一帧的深度值会残留,导致新帧遮挡关系错乱
+    GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 }
 
 void Renderer::Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const

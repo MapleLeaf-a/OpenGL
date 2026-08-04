@@ -73,6 +73,8 @@ int main(void)
     (GL_ZERO, GL_SRC_COLOR)             	src*0 + dst*src	    正片叠底（阴影）
     (GL_ONE_MINUS_DST_COLOR, GL_ONE)	    src*(1-dst) + dst*1	屏幕混合（高光）*/
 
+    GLCall(glEnable(GL_DEPTH_TEST)); //开启深度测试:让离摄像机近的片元遮挡远的片元,否则遮挡关系会错乱
+
     //相机相关
     GameObject mainCamera("MainCamera");
     mainCamera.GetTransform().SetPosition(glm::vec3(0.0f, 1.0f, 10.0f));
@@ -86,7 +88,7 @@ int main(void)
     std::shared_ptr<Mesh> cubeMesh = Mesh::CreateCube();
     std::shared_ptr<Mesh> planeMesh = Mesh::CreatePlane(10.0f);
     std::shared_ptr<Mesh> sphereMesh = Mesh::CreateSphere(24);
-    std::shared_ptr<Material> cubeMaterial = std::make_shared<Material>(glm::vec3(0.6f, 0.6f, 0.6f), 0.5f, 0.1f);
+    std::shared_ptr<Material> cubeMaterial = std::make_shared<Material>(glm::vec3(0.0f, 0.6f, 0.6f), 0.5f, 0.1f);
 
     GameObject cube("Cube");
     MeshRenderer* cubeRenderer = cube.AddComponent<MeshRenderer>(cubeMesh, cubeMaterial);
@@ -157,6 +159,7 @@ int main(void)
 
         cubeRenderer->Render(shader, renderer);       
         planeRenderer->Render(shader, renderer);
+        sphereRenderer->Render(shader, renderer);
 
         Transform& camTransform = mainCamera.GetTransform();
 
