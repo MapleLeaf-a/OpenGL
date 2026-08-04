@@ -64,6 +64,8 @@ public:
         }
     }
 
+    const std::string& GetName() const { return m_Name; }
+
 private:
     std::string m_Name;
     Transform m_Transform; //每个GO都应该有一个transform

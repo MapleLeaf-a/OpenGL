@@ -85,6 +85,7 @@ int main(void)
     //GO相关
     std::shared_ptr<Mesh> cubeMesh = Mesh::CreateCube();
     std::shared_ptr<Mesh> planeMesh = Mesh::CreatePlane(10.0f);
+    std::shared_ptr<Mesh> sphereMesh = Mesh::CreateSphere(24);
     std::shared_ptr<Material> cubeMaterial = std::make_shared<Material>(glm::vec3(0.6f, 0.6f, 0.6f), 0.5f, 0.1f);
 
     GameObject cube("Cube");
@@ -94,6 +95,10 @@ int main(void)
     GameObject plane("Plane");
     MeshRenderer* planeRenderer = plane.AddComponent<MeshRenderer>(planeMesh, std::make_shared<Material>(glm::vec3(0.5f, 0.5f, 0.5f), 0.8f, 0.0f));
     plane.GetTransform().SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+
+    GameObject sphere("Sphere");
+    MeshRenderer* sphereRenderer = sphere.AddComponent<MeshRenderer>(sphereMesh, std::make_shared<Material>(glm::vec3(0.8f, 0.2f, 0.2f), 0.3f, 1.0f));   
+    sphere.GetTransform().SetPosition(glm::vec3(0.0f, 1.0f, 3.0f));
 
     //着色器相关
     std::string vertFilePath = "Shaders/vert.shader";
