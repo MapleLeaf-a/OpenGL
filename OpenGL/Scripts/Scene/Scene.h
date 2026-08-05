@@ -1,6 +1,7 @@
 #pragma once
 
 #include "GameObject.h"
+#include <GameObjectFactory.h>
 
 class Scene
 {
@@ -72,6 +73,34 @@ public:
 
     //获取所有游戏物体
     const std::vector<std::unique_ptr<GameObject>>& GetGameObjects() const { return m_GameObjects; }    
+
+    GameObject* CreateCamera(const std::string& name = "Camera")
+    {
+        GameObject* camera = GameObjectFactory::CreateCamera(name);
+        m_GameObjects.push_back(std::unique_ptr<GameObject>(camera));
+        return camera;
+    }
+
+    GameObject* CreateCube(const std::string& name = "Cube", const glm::vec3& color = glm::vec3(0.5f, 0.5f, 0.5f))
+    {
+        GameObject* cube = GameObjectFactory::CreateCube(name, color);
+        m_GameObjects.push_back(std::unique_ptr<GameObject>(cube));
+        return cube;
+    }
+
+    GameObject* CreatePlane(const std::string& name = "Plane", float size = 5.0f, const glm::vec3& color = glm::vec3(0.5f, 0.5f, 0.5f))
+    {
+        GameObject* plane = GameObjectFactory::CreatePlane(name, size, color);
+        m_GameObjects.push_back(std::unique_ptr<GameObject>(plane));
+        return plane;
+    }
+
+    GameObject* CreateSphere(const std::string& name = "Sphere", int segments = 24, const glm::vec3& color = glm::vec3(0.5f, 0.5f, 0.5f))
+    {
+        GameObject* sphere = GameObjectFactory::CreateSphere(name, segments, color);
+        m_GameObjects.push_back(std::unique_ptr<GameObject>(sphere));
+        return sphere;
+    }
 
 private:
     std::vector<std::unique_ptr<GameObject>> m_GameObjects;
