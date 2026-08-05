@@ -78,32 +78,23 @@ int main(void)
 
     Scene scene;
 
-    GameObject* mainCamera = scene.CreateGameObject("MainCamera");
-    //相机相关
+    GameObject* mainCamera = scene.CreateCamera("MainCamera");
     mainCamera->GetTransform().SetPosition(glm::vec3(0.0f, 1.0f, 10.0f));
 
-    CameraComponent* cameraComp = mainCamera->AddComponent<CameraComponent>();
-    cameraComp->SetPerspective(45.0f, 16.0f / 9.0f, 0.1f, 100.0f);
+    CameraComponent* cameraComp = mainCamera->GetComponent<CameraComponent>();
 
-    // mainCamera.GetTransform().SetRotation(glm::vec3(0.0f, -90.0f, 0.0f));
-
-    //GO相关
-    std::shared_ptr<Mesh> cubeMesh = Mesh::CreateCube();
-    std::shared_ptr<Mesh> planeMesh = Mesh::CreatePlane(10.0f);
-    std::shared_ptr<Mesh> sphereMesh = Mesh::CreateSphere(24);
-    std::shared_ptr<Material> cubeMaterial = std::make_shared<Material>(glm::vec3(0.0f, 0.6f, 0.6f), 0.5f, 0.1f);
-
-    GameObject* cube = scene.CreateGameObject("Cube");
-    MeshRenderer* cubeRenderer = cube->AddComponent<MeshRenderer>(cubeMesh, cubeMaterial);
+    GameObject* cube = scene.CreateCube("Cube", glm::vec3(0.0f, 0.6f, 0.6f));
     cube->GetTransform().SetPosition(glm::vec3(1.0f, 2.0f, 5.0f));
 
-    GameObject* plane = scene.CreateGameObject("Plane");
-    MeshRenderer* planeRenderer = plane->AddComponent<MeshRenderer>(planeMesh, std::make_shared<Material>(glm::vec3(0.5f, 0.5f, 0.5f), 0.8f, 0.0f));
+    GameObject* plane = scene.CreatePlane("Plane", 10.0f, glm::vec3(0.5f, 0.5f, 0.5f));
     plane->GetTransform().SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 
-    GameObject* sphere = scene.CreateGameObject("Sphere");
-    MeshRenderer* sphereRenderer = sphere->AddComponent<MeshRenderer>(sphereMesh, std::make_shared<Material>(glm::vec3(0.8f, 0.2f, 0.2f), 0.3f, 1.0f));
+    GameObject* sphere = scene.CreateSphere("Sphere", 24, glm::vec3(0.8f, 0.2f, 0.2f));
     sphere->GetTransform().SetPosition(glm::vec3(0.0f, 1.0f, 3.0f));
+
+    MeshRenderer* cubeRenderer = cube->GetComponent<MeshRenderer>();
+    MeshRenderer* planeRenderer = plane->GetComponent<MeshRenderer>();
+    MeshRenderer* sphereRenderer = sphere->GetComponent<MeshRenderer>();
 
     //着色器相关
     std::string vertFilePath = "Shaders/vert.shader";

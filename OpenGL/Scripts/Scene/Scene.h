@@ -1,7 +1,6 @@
 #pragma once
 
 #include "GameObject.h"
-#include <GameObjectFactory.h>
 
 class Scene
 {
@@ -76,30 +75,45 @@ public:
 
     GameObject* CreateCamera(const std::string& name = "Camera")
     {
-        GameObject* camera = GameObjectFactory::CreateCamera(name);
-        m_GameObjects.push_back(std::unique_ptr<GameObject>(camera));
-        return camera;
+        std::unique_ptr<GameObject> camera = std::make_unique<GameObject>(name);
+        CameraComponent* cameraComp = camera->AddComponent<CameraComponent>();
+        cameraComp->SetPerspective(45.0f, 16.0f / 9.0f, 0.1f, 100.0f);
+        GameObject* rawPtr = camera.get(); //必须在move前获取原始指针,否则原地址被释放会变成垃圾地址
+        m_GameObjects.push_back(std::move(camera));
+        return rawPtr;
     }
 
     GameObject* CreateCube(const std::string& name = "Cube", const glm::vec3& color = glm::vec3(0.5f, 0.5f, 0.5f))
     {
-        GameObject* cube = GameObjectFactory::CreateCube(name, color);
-        m_GameObjects.push_back(std::unique_ptr<GameObject>(cube));
-        return cube;
+        std::unique_ptr<GameObject> cube = std::make_unique<GameObject>(name);
+        std::shared_ptr<Mesh> cubeMesh = Mesh::CreateCube();
+        std::shared_ptr<Material> cubeMaterial = std::make_shared<Material>(color, 0.5f, 0.1f);
+        cube->AddComponent<MeshRenderer>(cubeMesh, cubeMaterial);
+        GameObject* rawPtr = cube.get();
+        m_GameObjects.push_back(std::move(cube));
+        return rawPtr;
     }
 
     GameObject* CreatePlane(const std::string& name = "Plane", float size = 5.0f, const glm::vec3& color = glm::vec3(0.5f, 0.5f, 0.5f))
     {
-        GameObject* plane = GameObjectFactory::CreatePlane(name, size, color);
-        m_GameObjects.push_back(std::unique_ptr<GameObject>(plane));
-        return plane;
+        std::unique_ptr<GameObject> plane = std::make_unique<GameObject>(name);
+        std::shared_ptr<Mesh> planeMesh = Mesh::CreatePlane(size);
+        std::shared_ptr<Material> planeMaterial = std::make_shared<Material>(color, 0.5f, 0.1f);
+        plane->AddComponent<MeshRenderer>(planeMesh, planeMaterial);
+        GameObject* rawPtr = plane.get();
+        m_GameObjects.push_back(std::move(plane));
+        return rawPtr;
     }
 
     GameObject* CreateSphere(const std::string& name = "Sphere", int segments = 24, const glm::vec3& color = glm::vec3(0.5f, 0.5f, 0.5f))
     {
-        GameObject* sphere = GameObjectFactory::CreateSphere(name, segments, color);
-        m_GameObjects.push_back(std::unique_ptr<GameObject>(sphere));
-        return sphere;
+        std::unique_ptr<GameObject> sphere = std::make_unique<GameObject>(name);
+        std::shared_ptr<Mesh> sphereMesh = Mesh::CreateSphere(segments);
+        std::shared_ptr<Material> sphereMaterial = std::make_shared<Material>(color, 0.5f, 0.1f);
+        sphere->AddComponent<MeshRenderer>(sphereMesh, sphereMaterial);
+        GameObject* rawPtr = sphere.get();
+        m_GameObjects.push_back(std::move(sphere));
+        return rawPtr;
     }
 
 private:
