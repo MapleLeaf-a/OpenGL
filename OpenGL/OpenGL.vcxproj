@@ -157,7 +157,10 @@
   <ItemGroup>
     <ClInclude Include="Scripts\Components\CameraComponent.h" />
     <ClInclude Include="Scripts\Components\Component.h" />
+    <ClInclude Include="Scripts\Components\Material.h" />
     <ClInclude Include="Scripts\Components\Mesh.h" />
+    <ClInclude Include="Scripts\GameObjects\GameObject.h" />
+    <ClInclude Include="Scripts\GameObjects\GameObjectFactory.h" />
     <ClInclude Include="Scripts\IndexBuffer.h" />
     <ClInclude Include="Scripts\Renderer.h" />
     <ClInclude Include="Scripts\Shader.h" />
