@@ -26,6 +26,7 @@
 #include "Mesh.h"
 #include "Material.h"
 #include "MeshRenderer.h"
+#include "Scene.h"
 
 int main(void)
 {
@@ -75,11 +76,13 @@ int main(void)
 
     GLCall(glEnable(GL_DEPTH_TEST)); //开启深度测试:让离摄像机近的片元遮挡远的片元,否则遮挡关系会错乱
 
-    //相机相关
-    GameObject mainCamera("MainCamera");
-    mainCamera.GetTransform().SetPosition(glm::vec3(0.0f, 1.0f, 10.0f));
+    Scene scene;
 
-    CameraComponent* cameraComp = mainCamera.AddComponent<CameraComponent>();
+    GameObject* mainCamera = scene.CreateGameObject("MainCamera");
+    //相机相关
+    mainCamera->GetTransform().SetPosition(glm::vec3(0.0f, 1.0f, 10.0f));
+
+    CameraComponent* cameraComp = mainCamera->AddComponent<CameraComponent>();
     cameraComp->SetPerspective(45.0f, 16.0f / 9.0f, 0.1f, 100.0f);
 
     // mainCamera.GetTransform().SetRotation(glm::vec3(0.0f, -90.0f, 0.0f));
@@ -90,17 +93,17 @@ int main(void)
     std::shared_ptr<Mesh> sphereMesh = Mesh::CreateSphere(24);
     std::shared_ptr<Material> cubeMaterial = std::make_shared<Material>(glm::vec3(0.0f, 0.6f, 0.6f), 0.5f, 0.1f);
 
-    GameObject cube("Cube");
-    MeshRenderer* cubeRenderer = cube.AddComponent<MeshRenderer>(cubeMesh, cubeMaterial);
-    cube.GetTransform().SetPosition(glm::vec3(1.0f, 2.0f, 5.0f));
+    GameObject* cube = scene.CreateGameObject("Cube");
+    MeshRenderer* cubeRenderer = cube->AddComponent<MeshRenderer>(cubeMesh, cubeMaterial);
+    cube->GetTransform().SetPosition(glm::vec3(1.0f, 2.0f, 5.0f));
 
-    GameObject plane("Plane");
-    MeshRenderer* planeRenderer = plane.AddComponent<MeshRenderer>(planeMesh, std::make_shared<Material>(glm::vec3(0.5f, 0.5f, 0.5f), 0.8f, 0.0f));
-    plane.GetTransform().SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+    GameObject* plane = scene.CreateGameObject("Plane");
+    MeshRenderer* planeRenderer = plane->AddComponent<MeshRenderer>(planeMesh, std::make_shared<Material>(glm::vec3(0.5f, 0.5f, 0.5f), 0.8f, 0.0f));
+    plane->GetTransform().SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 
-    GameObject sphere("Sphere");
-    MeshRenderer* sphereRenderer = sphere.AddComponent<MeshRenderer>(sphereMesh, std::make_shared<Material>(glm::vec3(0.8f, 0.2f, 0.2f), 0.3f, 1.0f));   
-    sphere.GetTransform().SetPosition(glm::vec3(0.0f, 1.0f, 3.0f));
+    GameObject* sphere = scene.CreateGameObject("Sphere");
+    MeshRenderer* sphereRenderer = sphere->AddComponent<MeshRenderer>(sphereMesh, std::make_shared<Material>(glm::vec3(0.8f, 0.2f, 0.2f), 0.3f, 1.0f));
+    sphere->GetTransform().SetPosition(glm::vec3(0.0f, 1.0f, 3.0f));
 
     //着色器相关
     std::string vertFilePath = "Shaders/vert.shader";
@@ -161,7 +164,7 @@ int main(void)
         planeRenderer->Render(shader, renderer);
         sphereRenderer->Render(shader, renderer);
 
-        Transform& camTransform = mainCamera.GetTransform();
+        Transform& camTransform = mainCamera->GetTransform();
 
         {
             ImGui::Begin("Camera Transform");
