@@ -92,10 +92,6 @@ int main(void)
     GameObject* sphere = scene.CreateSphere("Sphere", 24, glm::vec3(0.8f, 0.2f, 0.2f));
     sphere->GetTransform().SetPosition(glm::vec3(0.0f, 1.0f, 3.0f));
 
-    MeshRenderer* cubeRenderer = cube->GetComponent<MeshRenderer>();
-    MeshRenderer* planeRenderer = plane->GetComponent<MeshRenderer>();
-    MeshRenderer* sphereRenderer = sphere->GetComponent<MeshRenderer>();
-
     //着色器相关
     std::string vertFilePath = "Shaders/vert.shader";
     std::string fragFilePath = "Shaders/frag.shader";
@@ -151,9 +147,7 @@ int main(void)
         shader.SetUniformMat4f("u_View", view);
         shader.SetUniformMat4f("u_Projection", proj);
 
-        cubeRenderer->Render(shader, renderer);       
-        planeRenderer->Render(shader, renderer);
-        sphereRenderer->Render(shader, renderer);
+        scene.RenderAllMeshRenderers(shader, renderer);
 
         Transform& camTransform = mainCamera->GetTransform();
 

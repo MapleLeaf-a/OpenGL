@@ -88,7 +88,8 @@ public:
         std::unique_ptr<GameObject> cube = std::make_unique<GameObject>(name);
         std::shared_ptr<Mesh> cubeMesh = Mesh::CreateCube();
         std::shared_ptr<Material> cubeMaterial = std::make_shared<Material>(color, 0.5f, 0.1f);
-        cube->AddComponent<MeshRenderer>(cubeMesh, cubeMaterial);
+        MeshRenderer* cubeRenderer = cube->AddComponent<MeshRenderer>(cubeMesh, cubeMaterial);
+        m_MeshRenderers.push_back(cubeRenderer);
         GameObject* rawPtr = cube.get();
         m_GameObjects.push_back(std::move(cube));
         return rawPtr;
@@ -99,7 +100,8 @@ public:
         std::unique_ptr<GameObject> plane = std::make_unique<GameObject>(name);
         std::shared_ptr<Mesh> planeMesh = Mesh::CreatePlane(size);
         std::shared_ptr<Material> planeMaterial = std::make_shared<Material>(color, 0.5f, 0.1f);
-        plane->AddComponent<MeshRenderer>(planeMesh, planeMaterial);
+        MeshRenderer* planeRenderer = plane->AddComponent<MeshRenderer>(planeMesh, planeMaterial);
+        m_MeshRenderers.push_back(planeRenderer);
         GameObject* rawPtr = plane.get();
         m_GameObjects.push_back(std::move(plane));
         return rawPtr;
@@ -110,12 +112,25 @@ public:
         std::unique_ptr<GameObject> sphere = std::make_unique<GameObject>(name);
         std::shared_ptr<Mesh> sphereMesh = Mesh::CreateSphere(segments);
         std::shared_ptr<Material> sphereMaterial = std::make_shared<Material>(color, 0.5f, 0.1f);
-        sphere->AddComponent<MeshRenderer>(sphereMesh, sphereMaterial);
+        MeshRenderer* sphereRenderer = sphere->AddComponent<MeshRenderer>(sphereMesh, sphereMaterial);
+        m_MeshRenderers.push_back(sphereRenderer);
         GameObject* rawPtr = sphere.get();
         m_GameObjects.push_back(std::move(sphere));
         return rawPtr;
     }
 
+    void RenderAllMeshRenderers(Shader& shader, const Renderer& renderer) const
+    {
+        for (const MeshRenderer* meshRenderer: m_MeshRenderers)
+        {
+            meshRenderer->Render(shader, renderer);
+        }
+    }
+
 private:
+    //游戏物体集合
     std::vector<std::unique_ptr<GameObject>> m_GameObjects;
+    
+    //MeshRenderer集合,用于在场景中统一管理所有MeshRenderer组件,方便渲染
+    std::vector<MeshRenderer*> m_MeshRenderers;
 };
