@@ -72,6 +72,8 @@ public:
 
     //获取所有游戏物体
     const std::vector<std::unique_ptr<GameObject>>& GetGameObjects() const { return m_GameObjects; }    
+    //获取所有MeshRenderer
+    const std::vector<MeshRenderer*>& GetMeshRenderers() const { return m_MeshRenderers; }
 
     GameObject* CreateCamera(const std::string& name = "Camera")
     {
