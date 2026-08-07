@@ -1,6 +1,7 @@
 #pragma once
 
 #include "GameObject.h"
+#include "LightComponent.h"
 
 class Scene
 {
@@ -129,10 +130,23 @@ public:
         }
     }
 
+    GameObject* CreateDirectionalLight(const std::string& name = "DirectionalLight", glm::vec3 color = glm::vec3(1.0f), float intensity = 1.0f)
+    {
+        std::unique_ptr<GameObject> light = std::make_unique<GameObject>(name);
+        LightComponent* lightComponent = light->AddComponent<LightComponent>(LightType::Directional, color, intensity);
+        GameObject* rawPtr = light.get();
+        m_GameObjects.push_back(std::move(light));
+        m_Lights.push_back(lightComponent);
+        return rawPtr;
+    }
+
 private:
     //游戏物体集合
     std::vector<std::unique_ptr<GameObject>> m_GameObjects;
     
     //MeshRenderer集合,用于在场景中统一管理所有MeshRenderer组件,方便渲染
     std::vector<MeshRenderer*> m_MeshRenderers;
+
+    //
+    std::vector<LightComponent*> m_Lights;
 };
