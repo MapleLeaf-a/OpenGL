@@ -12,6 +12,9 @@ enum class LightType
 class LightComponent : public Component
 {
 public:
+    LightComponent(LightType type, glm::vec3 color, float intensity) 
+        : m_LightType(type), m_Color(color), m_Intensity(intensity) {}
+
     glm::vec3 GetColor() const { return m_Color; }
     float GetIntensity() const { return m_Intensity; }
 
