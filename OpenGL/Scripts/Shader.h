@@ -8,10 +8,10 @@
 class Shader
 {
 private:
-	unsigned int m_RendererID;
-	unsigned int m_type;
 	mutable std::unordered_map<std::string, int> m_UniformlocationCache;
 	//声明为mutable,声明“这个成员不算对象的逻辑状态，可以修改”,于是这个成员经过mutable标记以后就可以在const函数中更改了
+	unsigned int m_RendererID;
+	unsigned int m_type;
 public:
 	Shader(const std::string& vertFilePath, const std::string& fragFilePath);
 	~Shader();

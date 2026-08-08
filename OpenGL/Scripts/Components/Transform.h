@@ -106,10 +106,11 @@ private:
         m_Dirty = false;
     }
 
-	glm::vec3 m_Position;
-	glm::quat m_Rotation;   //四元数存储旋转,计算量更小且避免万向锁
-	glm::vec3 m_Scale;
 	glm::mat4 m_modelMatrix;
+	glm::quat m_Rotation;   //四元数存储旋转,计算量更小且避免万向锁
+	glm::vec3 m_Position;
+	glm::vec3 m_Scale;
+	
 	bool m_Dirty;
 };
 

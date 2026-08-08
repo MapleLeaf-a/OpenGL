@@ -2,7 +2,7 @@
 
 #include "Component.h"
 
-enum class LightType
+enum class LightType : uint8_t //指定只占1字节
 {
     Directional,
     Point,
@@ -31,9 +31,9 @@ public:
     }
 
 private:
-    LightType m_LightType = LightType::Directional;
-
     glm::vec3 m_Color = glm::vec3(1.0f);
 
     float m_Intensity = 1.0f;
+
+    LightType m_LightType = LightType::Directional;
 };

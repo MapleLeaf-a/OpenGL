@@ -68,8 +68,7 @@ private:
         }
     }
 
-    //是否是透视投影
-    bool m_IsPerspective = true;
+    glm::mat4 m_ProjectionMatrix = glm::mat4(1.0f);
 
     //透视投影参数
     float m_Fov = 45.0f;
@@ -82,7 +81,8 @@ private:
     float m_NearPlane = 0.1f;
     float m_FarPlane = 100.0f;
 
-    glm::mat4 m_ProjectionMatrix = glm::mat4(1.0f);
+    //是否是透视投影
+    bool m_IsPerspective = true;
 
     bool m_ProjDirty = true;    
 };

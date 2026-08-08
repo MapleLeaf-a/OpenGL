@@ -67,7 +67,7 @@ public:
     const std::string& GetName() const { return m_Name; }
 
 private:
-    std::string m_Name;
     Transform m_Transform; //每个GO都应该有一个transform
+    std::string m_Name;
     std::vector<std::unique_ptr<Component>> m_Components; //组件和GO同生命周期
 };
