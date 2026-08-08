@@ -8,7 +8,7 @@ uniform mat4 u_Model;
 uniform mat4 u_View;
 uniform mat4 u_Projection;
 
-out vec3 v_Pos;
+out vec3 v_Pos; //世界坐标
 out vec3 v_Normal;
 out vec2 v_TexCoord; //(v代表Varing)通过Varing将顶点着色器传递到片段着色器
 
