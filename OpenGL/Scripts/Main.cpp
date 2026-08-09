@@ -85,13 +85,13 @@ int main(void)
 
     CameraComponent* cameraComp = mainCamera->GetComponent<CameraComponent>();
 
-    GameObject* cube = scene.CreateCube("Cube", glm::vec3(0.0f, 0.6f, 0.6f));
+    GameObject* cube = scene.CreateCube<BlinnPhongMaterial>("Cube", glm::vec3(0.0f, 0.6f, 0.6f), glm::vec3(1.0f), 200);
     cube->GetTransform().SetPosition(glm::vec3(1.0f, 2.0f, 5.0f));
 
-    GameObject* plane = scene.CreatePlane("Plane", 10.0f, glm::vec3(0.5f, 0.5f, 0.5f));
+    GameObject* plane = scene.CreatePlane<BlinnPhongMaterial>("Plane", 10.0f, glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(1.0f), 200);
     plane->GetTransform().SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 
-    GameObject* sphere = scene.CreateSphere("Sphere", 24, glm::vec3(0.8f, 0.2f, 0.2f));
+    GameObject* sphere = scene.CreateSphere<BlinnPhongMaterial>("Sphere", 48, glm::vec3(0.8f, 0.2f, 0.2f), glm::vec3(1.0f), 200);
     sphere->GetTransform().SetPosition(glm::vec3(0.0f, 1.0f, 3.0f));
 
     //着色器相关
@@ -115,7 +115,10 @@ int main(void)
 
     //创建LightUBO
     LightUBO lightUBO;
-    GameObject* light = scene.CreatePointLight("PointLight", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), 1.0f);
+    // GameObject* light = scene.CreatePointLight("PointLight", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), 50.0f);
+    GameObject* light = scene.CreateDirectionalLight("DirectionalLight", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), 2.0f);
+    light->GetTransform().SetPosition(glm::vec3(0.0f, 5.0f, 7.0f));
+    light->GetTransform().SetRotation(glm::vec3(-30.0f, 0.0f, 0.0f));
 
     Renderer renderer;
 

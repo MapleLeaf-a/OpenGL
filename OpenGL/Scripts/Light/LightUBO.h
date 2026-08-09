@@ -53,7 +53,7 @@ public:
         glBufferData	分配新显存（可能重新分配）	 首次分配，或数据大小变化时
         glBufferSubData	更新已有显存的内容          每帧更新数据 
         glBufferSubData 不会重新分配内存，只是覆盖数据，效率更高*/
-        GLCall((GL_UNIFORM_BUFFER, 0));
+        GLCall(glBindBuffer(GL_UNIFORM_BUFFER, 0));
     }
 
 private:

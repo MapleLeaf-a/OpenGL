@@ -14,7 +14,7 @@ class LightComponent : public Component
 {
 public:
     LightComponent(LightType type, glm::vec4 color, float intensity) 
-        : lightData{glm::vec4(GetPosition(), 0), glm::vec4(GetDirection(), 0), color, intensity, (int)type} {}
+        : lightData{glm::vec4(GetPosition(), 0.0f), glm::vec4(GetDirection(), 0.0f), color, intensity, (int)type} {}
 
     glm::vec4 GetColor() const { return lightData.color; }
     float GetIntensity() const { return lightData.intensity; }
@@ -31,7 +31,16 @@ public:
         return trans ? trans->GetForward() : glm::vec3(0.0f); //获取Forward作为方向光的方向
     }
 
-    const LightData& GetLightData() const { return lightData; }
+    const LightData& GetLightData()
+    {
+        Transform* trans = GetTransform();
+        if (trans->GetDirty())
+        {
+            lightData.direction = glm::vec4(GetDirection(), 0.0f);
+            lightData.position = glm::vec4(GetPosition(), 0.0f);
+        }
+        return lightData;
+    }
 
 private:
     LightData lightData;

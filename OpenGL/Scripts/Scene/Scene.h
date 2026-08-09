@@ -88,41 +88,35 @@ public:
         return rawPtr;
     }
 
-    GameObject* CreateCube(const std::string& name = "Cube", const glm::vec3& color = glm::vec3(0.5f, 0.5f, 0.5f))
+    template<typename MaterialType, typename... Args>
+    GameObject* CreateCube(const std::string& name = "Cube", Args&&... args)
     {
         std::shared_ptr<Mesh> cubeMesh = Mesh::CreateCube();
-        std::shared_ptr<PBRMaterial> cubeMaterial = std::make_shared<PBRMaterial>(color, 0.5f, 0.1f);
         
-        return Create3DObject(name, cubeMesh, cubeMaterial);
+        return Create3DObject<MaterialType>(name, cubeMesh, std::forward<Args>(args)...);
     }
 
-    GameObject* CreatePlane(const std::string& name = "Plane", float size = 5.0f, const glm::vec3& color = glm::vec3(0.5f, 0.5f, 0.5f))
+    template<typename MaterialType, typename... Args>
+    GameObject* CreatePlane(const std::string& name = "Plane", float size = 5.0f, Args&&... args)
     {
         std::shared_ptr<Mesh> planeMesh = Mesh::CreatePlane(size);
-        std::shared_ptr<PBRMaterial> planeMaterial = std::make_shared<PBRMaterial>(color, 0.5f, 0.1f);
-        
-        return Create3DObject(name, planeMesh, planeMaterial);
+       
+        return Create3DObject<MaterialType>(name, planeMesh, std::forward<Args>(args)...);
     }
 
-    GameObject* CreateSphere(const std::string& name = "Sphere", int segments = 24, const glm::vec3& color = glm::vec3(0.5f, 0.5f, 0.5f))
+    template<typename MaterialType, typename... Args>
+    GameObject* CreateSphere(const std::string& name = "Sphere", int segments = 24, Args&&... args)
     {
         std::shared_ptr<Mesh> sphereMesh = Mesh::CreateSphere(segments);
-        std::shared_ptr<PBRMaterial> sphereMaterial = std::make_shared<PBRMaterial>(color, 0.5f, 0.1f);
 
-        return Create3DObject(name, sphereMesh, sphereMaterial);
+        return Create3DObject<MaterialType>(name, sphereMesh, std::forward<Args>(args)...);
     }
 
-    GameObject* CreateSphere(const std::string& name = "Sphere", int segments = 24, const glm::vec3& kd = glm::vec3(0.0f, 0.0f, 0.0f),
-                const glm::vec3& ks = glm::vec3(0.0f, 0.0f, 0.0f), const glm::vec3& ka = glm::vec3(0.0f, 0.0f, 0.0f), float pow = 100)
+    template<typename MaterialType, typename... Args> //变参模板以满足不同材质对不同参数的要求
+    GameObject* Create3DObject(const std::string& name, std::shared_ptr<Mesh> mesh, Args&&... args)
     {
-        std::shared_ptr<Mesh> sphereMesh = Mesh::CreateSphere(segments);
-        std::shared_ptr<BlinnPhongMaterial> sphereMaterial = std::make_shared<BlinnPhongMaterial>(kd, ks, ka, pow);
+        auto material = std::make_shared<MaterialType>(std::forward<Args>(args)...);
 
-        return Create3DObject(name, sphereMesh, sphereMaterial);
-    }
-
-    GameObject* Create3DObject(const std::string& name, std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> material)
-    {
         std::unique_ptr<GameObject> go = std::make_unique<GameObject>(name);
         MeshRenderer* meshRenderer = go->AddComponent<MeshRenderer>(mesh, material);
         m_MeshRenderers.push_back(meshRenderer);

@@ -96,6 +96,9 @@ public:
 		Rotate(quat);
 	}
 
+	//获取矩阵是否需要更新的标志
+	bool GetDirty() { return m_Dirty; }
+
 private:
 	void UpdateModelMatrix() 
 	{

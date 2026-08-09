@@ -81,6 +81,7 @@ std::shared_ptr<Mesh> Mesh::CreateCube() {
     return std::make_shared<Mesh>(vertices, indices);
 }
 
+//size是总大小
 std::shared_ptr<Mesh> Mesh::CreatePlane(float size) {
     float half = size * 0.5f;
     std::vector<Vertex> vertices = {

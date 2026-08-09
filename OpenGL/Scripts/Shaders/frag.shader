@@ -8,8 +8,8 @@ in vec2 v_TexCoord;
 //材质相关
 uniform vec3 u_Kd;
 uniform vec3 u_Ks;
-uniform vec3 u_Ka;
-uniform float u_KsPow;
+const vec3 u_Ka = vec3(0.05f);
+uniform int u_KsPow;
 
 
 //相机相关
@@ -35,31 +35,35 @@ layout(location = 0) out vec4 color;
 
 vec4 BlinnPhong(Light light)
 {
-    if (light.type == 1) //点光源
+    vec3 Ld, Ls, La;
+
+    float attenuation = light.intensity; //衰减
+
+    vec3 l; //光离着色点的方向
+
+    if (light.type == 0) //方向光,方向光不衰减
     {
-        vec3 n = normalize(v_Normal);
-        
+        l = normalize(-light.direction.xyz); //方向光朝向的反方向就是l
+    }
+    else if (light.type == 1) //点光源
+    {
         vec3 diff = light.position.xyz - v_Pos;
         float r = length(diff);
-        float r_square = r * r;
-        
-        vec3 l = normalize(diff);
-        
-        float I = light.intensity;
-        float divi = I / r_square;
-        
-        vec3 Ld = u_Kd * divi * max(0, dot(n, l)); 
-
-        vec3 v = normalize(u_ViewPos - v_Pos);
-        vec3 h = normalize(v + l);
-        vec3 Ls = u_Ks * divi * pow(max(0, dot(n, h)), u_KsPow);
-
-        vec3 La = u_Ka;
-        
-        return vec4(Ld + Ls + La, 1.0f);
+        l = normalize(diff);
+        attenuation /= (r * r);
     }
 
-    return vec4(0.0f);
+    vec3 n = normalize(v_Normal);
+    
+    Ld = u_Kd * attenuation * max(0, dot(n, l)); 
+
+    vec3 v = normalize(u_ViewPos - v_Pos);
+    vec3 h = normalize(v + l);
+    Ls = u_Ks * attenuation * pow(max(0, dot(n, h)), u_KsPow);
+
+    La = u_Ka;
+
+    return vec4(Ld + Ls + La, 1.0f);
 }
 
 void main()
