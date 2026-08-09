@@ -1,12 +1,12 @@
 #pragma once
 
-#include "glm/glm.hpp"
-#include "Shader.h"
+#include "Material.h"
 
-class Material{
+class PBRMaterial : public Material
+{
 public:
-    Material() = default;
-    Material(glm::vec3 albedo, float roughness, float metallic)
+    PBRMaterial() = default;
+    PBRMaterial(glm::vec3 albedo, float roughness, float metallic)
         : m_Albedo(albedo), m_Roughness(roughness), m_Metallic(metallic) {}
 
     void SetAlbedo(const glm::vec3& color) { m_Albedo = color; }
@@ -14,7 +14,7 @@ public:
     void SetMetallic(float metallic) { m_Metallic = metallic; }
 
     //将材质属性应用到着色器中
-    void Apply(Shader& shader) const
+    void Apply(Shader& shader) const override
     {
         shader.SetUniform4f("u_Albedo", m_Albedo.r, m_Albedo.g, m_Albedo.b, 1.0f);
         shader.SetUniform1f("u_Roughness", m_Roughness);

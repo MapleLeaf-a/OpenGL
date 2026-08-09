@@ -1,9 +1,9 @@
 #pragma once
 
-#include "glm/glm.hpp"
-#include "Shader.h"
+#include "Material.h"
 
-class BlinnPhongMaterial{
+class BlinnPhongMaterial : public Material
+{
 public:
     BlinnPhongMaterial() = default;
     BlinnPhongMaterial(glm::vec3 kd, glm::vec3 ks, glm::vec3 ka, float pow)
@@ -15,7 +15,7 @@ public:
     void SetKsPow(float pow) { m_KsPow = pow; }
 
     //将材质属性应用到着色器中
-    void Apply(Shader& shader) const
+    void Apply(Shader& shader) const override
     {
         shader.SetUniform3f("u_Kd", m_Kd);
         shader.SetUniform3f("u_Ks", m_Ks);

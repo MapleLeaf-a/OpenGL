@@ -55,9 +55,11 @@ vec4 BlinnPhong(Light light)
         vec3 Ls = u_Ks * divi * pow(max(0, dot(n, h)), u_KsPow);
 
         vec3 La = u_Ka;
+        
+        return vec4(Ld + Ls + La, 1.0f);
     }
 
-    return ;
+    return vec4(0.0f);
 }
 
 void main()

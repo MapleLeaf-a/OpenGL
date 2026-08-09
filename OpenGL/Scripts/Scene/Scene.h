@@ -3,6 +3,7 @@
 #include "GameObject.h"
 #include "LightComponent.h"
 #include "LightUBO.h"
+#include "PBRMaterial.h"
 
 class Scene
 {
@@ -89,37 +90,44 @@ public:
 
     GameObject* CreateCube(const std::string& name = "Cube", const glm::vec3& color = glm::vec3(0.5f, 0.5f, 0.5f))
     {
-        std::unique_ptr<GameObject> cube = std::make_unique<GameObject>(name);
         std::shared_ptr<Mesh> cubeMesh = Mesh::CreateCube();
-        std::shared_ptr<Material> cubeMaterial = std::make_shared<Material>(color, 0.5f, 0.1f);
-        MeshRenderer* cubeRenderer = cube->AddComponent<MeshRenderer>(cubeMesh, cubeMaterial);
-        m_MeshRenderers.push_back(cubeRenderer);
-        GameObject* rawPtr = cube.get();
-        m_GameObjects.push_back(std::move(cube));
-        return rawPtr;
+        std::shared_ptr<PBRMaterial> cubeMaterial = std::make_shared<PBRMaterial>(color, 0.5f, 0.1f);
+        
+        return Create3DObject(name, cubeMesh, cubeMaterial);
     }
 
     GameObject* CreatePlane(const std::string& name = "Plane", float size = 5.0f, const glm::vec3& color = glm::vec3(0.5f, 0.5f, 0.5f))
     {
-        std::unique_ptr<GameObject> plane = std::make_unique<GameObject>(name);
         std::shared_ptr<Mesh> planeMesh = Mesh::CreatePlane(size);
-        std::shared_ptr<Material> planeMaterial = std::make_shared<Material>(color, 0.5f, 0.1f);
-        MeshRenderer* planeRenderer = plane->AddComponent<MeshRenderer>(planeMesh, planeMaterial);
-        m_MeshRenderers.push_back(planeRenderer);
-        GameObject* rawPtr = plane.get();
-        m_GameObjects.push_back(std::move(plane));
-        return rawPtr;
+        std::shared_ptr<PBRMaterial> planeMaterial = std::make_shared<PBRMaterial>(color, 0.5f, 0.1f);
+        
+        return Create3DObject(name, planeMesh, planeMaterial);
     }
 
     GameObject* CreateSphere(const std::string& name = "Sphere", int segments = 24, const glm::vec3& color = glm::vec3(0.5f, 0.5f, 0.5f))
     {
-        std::unique_ptr<GameObject> sphere = std::make_unique<GameObject>(name);
         std::shared_ptr<Mesh> sphereMesh = Mesh::CreateSphere(segments);
-        std::shared_ptr<Material> sphereMaterial = std::make_shared<Material>(color, 0.5f, 0.1f);
-        MeshRenderer* sphereRenderer = sphere->AddComponent<MeshRenderer>(sphereMesh, sphereMaterial);
-        m_MeshRenderers.push_back(sphereRenderer);
-        GameObject* rawPtr = sphere.get();
-        m_GameObjects.push_back(std::move(sphere));
+        std::shared_ptr<PBRMaterial> sphereMaterial = std::make_shared<PBRMaterial>(color, 0.5f, 0.1f);
+
+        return Create3DObject(name, sphereMesh, sphereMaterial);
+    }
+
+    GameObject* CreateSphere(const std::string& name = "Sphere", int segments = 24, const glm::vec3& kd = glm::vec3(0.0f, 0.0f, 0.0f),
+                const glm::vec3& ks = glm::vec3(0.0f, 0.0f, 0.0f), const glm::vec3& ka = glm::vec3(0.0f, 0.0f, 0.0f), float pow = 100)
+    {
+        std::shared_ptr<Mesh> sphereMesh = Mesh::CreateSphere(segments);
+        std::shared_ptr<BlinnPhongMaterial> sphereMaterial = std::make_shared<BlinnPhongMaterial>(kd, ks, ka, pow);
+
+        return Create3DObject(name, sphereMesh, sphereMaterial);
+    }
+
+    GameObject* Create3DObject(const std::string& name, std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> material)
+    {
+        std::unique_ptr<GameObject> go = std::make_unique<GameObject>(name);
+        MeshRenderer* meshRenderer = go->AddComponent<MeshRenderer>(mesh, material);
+        m_MeshRenderers.push_back(meshRenderer);
+        GameObject* rawPtr = go.get();
+        m_GameObjects.push_back(std::move(go));
         return rawPtr;
     }
 
