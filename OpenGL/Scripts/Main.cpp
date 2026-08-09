@@ -25,6 +25,7 @@
 #include "CameraComponent.h"
 #include "Mesh.h"
 #include "Material.h"
+#include "BlinnPhongMaterial.h"
 #include "MeshRenderer.h"
 #include "Scene.h"
 #include "LightUBO.h"

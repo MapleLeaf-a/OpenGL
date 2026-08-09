@@ -6,9 +6,6 @@ in vec3 v_Normal;
 in vec2 v_TexCoord;
 
 //材质相关
-uniform vec4 u_Albedo;
-uniform float u_Roughness;
-uniform float u_Metallic;
 uniform vec3 u_Kd;
 uniform vec3 u_Ks;
 uniform vec3 u_Ka;
@@ -51,7 +48,7 @@ vec4 BlinnPhong(Light light)
         float I = light.intensity;
         float divi = I / r_square;
         
-        vec3 Ld = u_Kd * u_Albedo * divi * max(0, dot(n, l)); 
+        vec3 Ld = u_Kd * divi * max(0, dot(n, l)); 
 
         vec3 v = normalize(u_ViewPos - v_Pos);
         vec3 h = normalize(v + l);
