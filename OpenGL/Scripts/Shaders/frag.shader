@@ -24,7 +24,7 @@ struct Light
 layout(std140, binding = 0) uniform LightBlock // <-- 这里定义了一块内存区域（Block）,块名
 {
     Light u_Light; // <-- 这块区域里的具体数据
-} ub_Light;
+} ub_Light;  //这个才是实例名
 
 layout(location = 0) out vec4 color;
 

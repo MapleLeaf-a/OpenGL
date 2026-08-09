@@ -133,8 +133,18 @@ public:
 
     GameObject* CreateDirectionalLight(const std::string& name = "DirectionalLight", glm::vec4 color = glm::vec4(1.0f), float intensity = 1.0f)
     {
+        return CreateLight(name, LightType::Directional, color, intensity);
+    }
+
+    GameObject* CreatePointLight(const std::string& name = "PointLight", glm::vec4 color = glm::vec4(1.0f), float intensity = 1.0f)
+    {
+        return CreateLight(name, LightType::Point, color, intensity);
+    }
+
+    GameObject* CreateLight(const std::string& name = "Light", LightType type = LightType::Directional, glm::vec4 color = glm::vec4(1.0f), float intensity = 1.0f)
+    {
         std::unique_ptr<GameObject> light = std::make_unique<GameObject>(name);
-        LightComponent* lightComponent = light->AddComponent<LightComponent>(LightType::Directional, color, intensity);
+        LightComponent* lightComponent = light->AddComponent<LightComponent>(type, color, intensity);
         GameObject* rawPtr = light.get();
         m_GameObjects.push_back(std::move(light));
         m_Lights.push_back(lightComponent);

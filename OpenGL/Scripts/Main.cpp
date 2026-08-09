@@ -114,7 +114,7 @@ int main(void)
 
     //创建LightUBO
     LightUBO lightUBO;
-    GameObject* light = scene.CreateDirectionalLight("DirectionalLight", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), 1.0f);
+    GameObject* light = scene.CreatePointLight("PointLight", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), 1.0f);
 
     Renderer renderer;
 
