@@ -10,7 +10,7 @@ public:
     LightUBO()
     {
         //创建UBO
-        GLCall((1, &m_RendererID));
+        GLCall(glGenBuffers(1, &m_RendererID));
         GLCall(glBindBuffer(GL_UNIFORM_BUFFER, m_RendererID)); //GL_UNIFORM_BUFFER 表示这是一个 Uniform 缓冲区
         
         //分配GPU显存空间
@@ -24,7 +24,7 @@ public:
         //解绑
         GLCall(glBindBuffer(GL_UNIFORM_BUFFER, 0));
 
-        GLCall((GL_UNIFORM_BUFFER, 0, m_RendererID));
+        GLCall(glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_RendererID));
         /*glBindBufferBase —— 把 UBO 绑定到 Shader 的 binding point
           参数	     类型	                含义
         第 1 个	GLenum target	缓冲区类型（GL_UNIFORM_BUFFER）
@@ -35,13 +35,13 @@ public:
 
     ~LightUBO()
     {
-        glDeleteBuffers(1, &m_RendererID);
+        GLCall(glDeleteBuffers(1, &m_RendererID));
     }
 
-    void Update(const LightData& light)
+    void Update(const LightData& lightData)
     {
-        glBindBuffer(GL_UNIFORM_BUFFER, m_RendererID);
-        glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(LightData), &light);
+        GLCall(glBindBuffer(GL_UNIFORM_BUFFER, m_RendererID));
+        GLCall(glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(LightData), &lightData));
         /*更新 UBO 数据
           参数	      类型	            含义
         第 1 个	GLenum target	    缓冲区类型
@@ -53,7 +53,7 @@ public:
         glBufferData	分配新显存（可能重新分配）	 首次分配，或数据大小变化时
         glBufferSubData	更新已有显存的内容          每帧更新数据 
         glBufferSubData 不会重新分配内存，只是覆盖数据，效率更高*/
-        glBindBuffer(GL_UNIFORM_BUFFER, 0);
+        GLCall((GL_UNIFORM_BUFFER, 0));
     }
 
 private:

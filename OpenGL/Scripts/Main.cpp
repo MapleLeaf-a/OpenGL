@@ -27,6 +27,7 @@
 #include "Material.h"
 #include "MeshRenderer.h"
 #include "Scene.h"
+#include "LightUBO.h"
 
 int main(void)
 {
@@ -110,6 +111,11 @@ int main(void)
 
     shader.Unbind(); //清理绑定状态，防止后续不小心使用
 
+
+    //创建LightUBO
+    LightUBO lightUBO;
+    GameObject* light = scene.CreateDirectionalLight("DirectionalLight", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), 1.0f);
+
     Renderer renderer;
 
 
@@ -148,6 +154,7 @@ int main(void)
         shader.SetUniformMat4f("u_Projection", proj);
 
         scene.RenderAllMeshRenderers(shader, renderer);
+        scene.RenderAllLights(lightUBO);
 
         Transform& camTransform = mainCamera->GetTransform();
 

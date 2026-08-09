@@ -2,6 +2,7 @@
 
 #include "GameObject.h"
 #include "LightComponent.h"
+#include "LightUBO.h"
 
 class Scene
 {
@@ -130,7 +131,7 @@ public:
         }
     }
 
-    GameObject* CreateDirectionalLight(const std::string& name = "DirectionalLight", glm::vec3 color = glm::vec3(1.0f), float intensity = 1.0f)
+    GameObject* CreateDirectionalLight(const std::string& name = "DirectionalLight", glm::vec4 color = glm::vec4(1.0f), float intensity = 1.0f)
     {
         std::unique_ptr<GameObject> light = std::make_unique<GameObject>(name);
         LightComponent* lightComponent = light->AddComponent<LightComponent>(LightType::Directional, color, intensity);
@@ -138,6 +139,11 @@ public:
         m_GameObjects.push_back(std::move(light));
         m_Lights.push_back(lightComponent);
         return rawPtr;
+    }
+
+    void RenderAllLights(LightUBO& lightUBO)
+    {
+        lightUBO.Update(m_Lights[0]->GetLightData());
     }
 
 private:
