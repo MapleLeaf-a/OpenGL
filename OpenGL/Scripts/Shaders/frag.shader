@@ -1,14 +1,22 @@
 #version 420 core
 
+//本身属性
 in vec3 v_Pos; //世界坐标
 in vec3 v_Normal;
 in vec2 v_TexCoord;
 
+//材质相关
 uniform vec4 u_Albedo;
 uniform float u_Roughness;
 uniform float u_Metallic;
+uniform vec3 u_Kd;
+uniform vec3 u_Ks;
+uniform vec3 u_Ka;
+uniform float u_KsPow;
 
 
+//相机相关
+uniform vec3 u_ViewPos;
 
 struct Light
 {
@@ -28,7 +36,34 @@ layout(std140, binding = 0) uniform LightBlock // <-- 这里定义了一块内�
 
 layout(location = 0) out vec4 color;
 
+vec4 BlinnPhong(Light light)
+{
+    if (light.type == 1) //点光源
+    {
+        vec3 n = normalize(v_Normal);
+        
+        vec3 diff = light.position.xyz - v_Pos;
+        float r = length(diff);
+        float r_square = r * r;
+        
+        vec3 l = normalize(diff);
+        
+        float I = light.intensity;
+        float divi = I / r_square;
+        
+        vec3 Ld = u_Kd * u_Albedo * divi * max(0, dot(n, l)); 
+
+        vec3 v = normalize(u_ViewPos - v_Pos);
+        vec3 h = normalize(v + l);
+        vec3 Ls = u_Ks * divi * pow(max(0, dot(n, h)), u_KsPow);
+
+        vec3 La = u_Ka;
+    }
+
+    return ;
+}
+
 void main()
 {
-    color = ub_Light.u_Light.color;
+    color = BlinnPhong(ub_Light.u_Light);
 }

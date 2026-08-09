@@ -49,7 +49,7 @@ int main(void)
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
 
-    glfwSwapInterval(1);//设置垂直同步（V-Sync，垂直同步）的函数。它的作用是：控制屏幕刷新率与帧率之间的同步关系。
+    glfwSwapInterval(0);//设置垂直同步（V-Sync，垂直同步）的函数。它的作用是：控制屏幕刷新率与帧率之间的同步关系。
     /*参数值	含义	效果
         0	关闭 V-Sync	帧率不受限制，GPU 全力渲染
         1	开启 V-Sync	帧率与屏幕刷新率同步（如 60Hz 显示器 = 60 FPS）
@@ -131,6 +131,8 @@ int main(void)
     float y = 0.0f;
     float z = 0.0f;
     
+    Transform& camTransform = mainCamera->GetTransform();
+
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {
@@ -153,10 +155,11 @@ int main(void)
         shader.SetUniformMat4f("u_View", view);
         shader.SetUniformMat4f("u_Projection", proj);
 
+        shader.SetUniform3f("u_ViewPos", camTransform.GetPosition());
+
         scene.RenderAllMeshRenderers(shader, renderer);
         scene.RenderAllLights(lightUBO);
 
-        Transform& camTransform = mainCamera->GetTransform();
 
         {
             ImGui::Begin("Camera Transform");

@@ -12,4 +12,4 @@ struct LightData
     float padding[2]; //填充8字节至一共64字节,与GPU端对齐
 };
 
-//static_assert(sizeof(LightData) == 64, "LightData size must be 64 bytes,so as to align with GPU");
+static_assert(sizeof(LightData) == 64, "LightData size must be 64 bytes,so as to align with GPU");
