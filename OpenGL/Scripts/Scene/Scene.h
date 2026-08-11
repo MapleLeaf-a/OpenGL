@@ -155,7 +155,16 @@ public:
 
     void RenderAllLights(LightUBO& lightUBO)
     {
-        lightUBO.Update(m_Lights[0]->GetLightData());
+        if (m_Lights.empty()) return;
+
+        std::vector<LightData> lights;
+
+        for (auto& i : m_Lights)
+        {
+            lights.push_back(i->GetLightData());
+        }
+
+        lightUBO.Update(lights);
     }
 
 private:
@@ -165,6 +174,6 @@ private:
     //MeshRenderer集合,用于在场景中统一管理所有MeshRenderer组件,方便渲染
     std::vector<MeshRenderer*> m_MeshRenderers;
 
-    //
+    //光源组件的集合
     std::vector<LightComponent*> m_Lights;
 };

@@ -2,6 +2,8 @@
 
 #include "glm/glm.hpp"
 
+#define MAXLIGHTS 16 //最大光源数量
+
 struct LightData
 {
     glm::vec4 position;
@@ -13,3 +15,12 @@ struct LightData
 };
 
 static_assert(sizeof(LightData) == 64, "LightData size must be 64 bytes,so as to align with GPU");
+
+struct LightDataBuffer
+{
+    LightData light[MAXLIGHTS];
+    int count;
+    float padding[3];
+};
+
+static_assert(sizeof(LightDataBuffer) == 64 * 16 + 16, "LightBufferData size mismatch");

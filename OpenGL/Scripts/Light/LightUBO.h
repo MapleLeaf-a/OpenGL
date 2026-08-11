@@ -14,7 +14,7 @@ public:
         GLCall(glBindBuffer(GL_UNIFORM_BUFFER, m_RendererID)); //GL_UNIFORM_BUFFER 表示这是一个 Uniform 缓冲区
         
         //分配GPU显存空间
-        GLCall(glBufferData(GL_UNIFORM_BUFFER, sizeof(LightData), nullptr, GL_DYNAMIC_DRAW));
+        GLCall(glBufferData(GL_UNIFORM_BUFFER, sizeof(LightDataBuffer), nullptr, GL_DYNAMIC_DRAW));
             /*usage 参数的常见值
                     值      	含义	        适用场景
             GL_STATIC_DRAW	数据几乎不变  顶点数据（模型加载后不变）
@@ -38,10 +38,18 @@ public:
         GLCall(glDeleteBuffers(1, &m_RendererID));
     }
 
-    void Update(const LightData& lightData)
+    void Update(const std::vector<LightData>& lights)
     {
+        LightDataBuffer buffer {};
+        buffer.count = std::min((int)lights.size(), MAXLIGHTS);
+
+        for (int i = 0; i < buffer.count; ++i)
+        {
+            buffer.light[i] = lights[i];
+        }
+
         GLCall(glBindBuffer(GL_UNIFORM_BUFFER, m_RendererID));
-        GLCall(glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(LightData), &lightData));
+        GLCall(glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(LightDataBuffer), &buffer));
         /*更新 UBO 数据
           参数	      类型	            含义
         第 1 个	GLenum target	    缓冲区类型

@@ -1,5 +1,7 @@
 #version 420 core
 
+#define MAXLIGHTS 16
+
 //本身属性
 in vec3 v_Pos; //世界坐标
 in vec3 v_Normal;
@@ -28,14 +30,15 @@ struct Light
 当你使用 UBO 时，你实际上是在 GPU 里划出了一块固定的显存区域，并给它起了个名字叫 LightBlock（在 Shader 里）。*/
 layout(std140, binding = 0) uniform LightBlock // <-- 这里定义了一块内存区域（Block）,块名
 {
-    Light u_Light; // <-- 这块区域里的具体数据
+    Light lights[MAXLIGHTS]; // <-- 这块区域里的具体数据
+    int count;
 } ub_Light;  //这个才是实例名
 
 layout(location = 0) out vec4 color;
 
 vec4 BlinnPhong(Light light)
 {
-    vec3 Ld, Ls, La;
+    vec3 Ld, Ls;
 
     float attenuation = light.intensity; //衰减
 
@@ -61,12 +64,14 @@ vec4 BlinnPhong(Light light)
     vec3 h = normalize(v + l);
     Ls = u_Ks * attenuation * pow(max(0, dot(n, h)), u_KsPow);
 
-    La = u_Ka;
-
-    return vec4(Ld + Ls + La, 1.0f);
+    return vec4(Ld + Ls, 1.0f);
 }
 
 void main()
 {
-    color = BlinnPhong(ub_Light.u_Light);
+    for (int i = 0; i < ub_Light.count; ++i)
+    {
+        color += BlinnPhong(ub_Light.lights[i]);
+    }
+    color += vec4(u_Ka, 1.0f);
 }
