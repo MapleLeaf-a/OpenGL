@@ -102,7 +102,9 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>GLEW_STATIC</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GLEW\include;$(SolutionDir)Dependencies\assimp\include;Scripts\vendor;Scripts;Scripts/Components;D:\计算机图形学\OpenGL\OpenGL%28Manually%29\OpenGL\Scripts\GameObjects;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GLEW\include;$(SolutionDir)Dependencies\assimp\include;Scripts\vendor;Scripts;Scripts\Components;Scripts\GameObjects;Scripts\Render;Scripts\Components\Materials;Scripts\Scene;Scripts\Light;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -119,7 +121,9 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>GLEW_STATIC</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GLEW\include;$(SolutionDir)Dependencies\assimp\include;Scripts\vendor;Scripts;Scripts/Components;D:\计算机图形学\OpenGL\OpenGL%28Manually%29\OpenGL\Scripts\GameObjects;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GLEW\include;$(SolutionDir)Dependencies\assimp\include;Scripts\vendor;Scripts;Scripts\Components;Scripts\GameObjects;Scripts\Render;Scripts\Components\Materials;Scripts\Scene;Scripts\Light;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -131,13 +135,11 @@
   <ItemGroup>
     <ClCompile Include="Scripts\Components\Component.cpp" />
     <ClCompile Include="Scripts\Components\Mesh.cpp" />
+    <ClCompile Include="Scripts\GameObjects\Model\Model.cpp" />
     <ClCompile Include="Scripts\IndexBuffer.cpp" />
-    <ClCompile Include="Scripts\Main(abstract).cpp" />
     <ClCompile Include="Scripts\Main.cpp" />
-    <ClCompile Include="Scripts\Renderer.cpp" />
+    <ClCompile Include="Scripts\Render\Renderer.cpp" />
     <ClCompile Include="Scripts\Shader.cpp" />
-    <ClCompile Include="Scripts\Tests\Test.cpp" />
-    <ClCompile Include="Scripts\Tests\TestClearColor.cpp" />
     <ClCompile Include="Scripts\Texture.cpp" />
     <ClCompile Include="Scripts\vendor\glm\detail\glm.cpp" />
     <ClCompile Include="Scripts\vendor\glm\glm.cppm" />
@@ -148,21 +150,29 @@
     <ClCompile Include="Scripts\vendor\imgui\imgui_impl_opengl3.cpp" />
     <ClCompile Include="Scripts\vendor\imgui\imgui_tables.cpp" />
     <ClCompile Include="Scripts\vendor\imgui\imgui_widgets.cpp" />
-    <ClCompile Include="Scripts\vendor\imgui\main.cpp" />
     <ClCompile Include="Scripts\vendor\stb_image\stb_image.cpp" />
     <ClCompile Include="Scripts\VertexArray.cpp" />
     <ClCompile Include="Scripts\VertexBuffer.cpp" />
-    <ClCompile Include="Scripts\Components\Transform.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Scripts\Components\CameraComponent.h" />
     <ClInclude Include="Scripts\Components\Component.h" />
+    <ClInclude Include="Scripts\Components\LightComponent.h" />
     <ClInclude Include="Scripts\Components\Material.h" />
+    <ClInclude Include="Scripts\Components\Materials\BlinnPhongMaterial.h" />
+    <ClInclude Include="Scripts\Components\Materials\Material.h" />
+    <ClInclude Include="Scripts\Components\Materials\PBRMaterial.h" />
     <ClInclude Include="Scripts\Components\Mesh.h" />
+    <ClInclude Include="Scripts\Components\MeshRenderer.h" />
     <ClInclude Include="Scripts\GameObjects\GameObject.h" />
     <ClInclude Include="Scripts\GameObjects\GameObjectFactory.h" />
+    <ClInclude Include="Scripts\GameObjects\Model\Model.h" />
     <ClInclude Include="Scripts\IndexBuffer.h" />
+    <ClInclude Include="Scripts\Light\LightData.h" />
+    <ClInclude Include="Scripts\Light\LightUBO.h" />
     <ClInclude Include="Scripts\Renderer.h" />
+    <ClInclude Include="Scripts\Render\Renderer.h" />
+    <ClInclude Include="Scripts\Scene\Scene.h" />
     <ClInclude Include="Scripts\Shader.h" />
     <ClInclude Include="Scripts\Tests\Test.h" />
     <ClInclude Include="Scripts\Tests\TestClearColor.h" />

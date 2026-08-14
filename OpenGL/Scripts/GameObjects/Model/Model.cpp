@@ -1,8 +1,6 @@
 #include "Model.h"
+#include "BlinnPhongMaterial.h"
 
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
 #include <iostream>
 
 bool Model::Load(const std::string &path)
@@ -53,6 +51,80 @@ void Model::ProcessNode(aiNode* node, const aiScene* scene)
 }
 
 ModelMesh Model::ProcessMesh(aiMesh *mesh, const aiScene *scene)
-{
-    return ModelMesh();
+{ //mesh 是真正的几何数据，包含顶点、索引、法线、UV 等
+    ModelMesh result{};
+    result.name = mesh->mName.C_Str(); /*mesh->mName	aiString	网格的名字（如 "Cube.001"）	mesh->mName.C_Str() 转成 C 字符串*/
+
+    //顶点数据
+    std::vector<Vertex> vertices;
+    vertices.resize(mesh->mNumVertices); //resize是扩容且初始化(后续不用再push_back),reserve是只分配内存(后续添加要push_back)
+
+    for (unsigned int i = 0; i < mesh->mNumVertices; i++)
+    {
+        Vertex vertex {};
+
+        //位置
+        vertex.position = glm::vec3(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z);
+        
+        //法线
+        if (mesh->HasNormals())
+            vertex.normal = glm::vec3(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z);
+        
+        //uv
+        if (mesh->HasTextureCoords(0)) //是否有第0套uv
+            vertex.texCoord = glm::vec2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y);
+        
+        vertices[i] = vertex;
+    }
+
+    //索引数据
+    std::vector<unsigned int> indices;
+    indices.resize(mesh->mNumFaces * 3); //mesh->mNumFaces三角形面的数量
+
+    for (unsigned int i = 0; i < mesh->mNumFaces; i++)
+    {
+        aiFace face = mesh->mFaces[i]; //mFaces面数组（每个面包含顶点索引）
+        for (unsigned int j = 0; j < face.mNumIndices; j++) //mNumIndices这个面包含的顶点数（三角形是 3）
+        {
+            indices[i] = face.mIndices[j];
+        }
+    }
+
+    //创建Mesh
+    result.mesh = std::make_shared<Mesh>(vertices, indices);
+
+    //提取材质
+    if (mesh->mMaterialIndex >= 0)
+    {
+        aiMaterial* aiMat = scene->mMaterials[mesh->mMaterialIndex];
+        /*scene->mMaterials	aiMaterial**	所有材质的数组（色卡）	用 mesh->mMaterialIndex 做索引取材质*/ 
+        
+        //Kd,漫反射
+        aiColor3D diffuseColor();
+        aiMat->Get(AI_MATKEY_COLOR_DIFFUSE, diffuseColor);
+
+        //Ks,镜面反射
+        aiColor3D specularColor();
+        aiMat->Get(AI_MATKEY_COLOR_SPECULAR, specularColor);
+
+        //ksPow
+        float pow = 150.0f;
+        aiMat->Get(AI_MATKEY_SHININESS, pow);
+
+        auto material = std::make_shared<BlinnPhongMaterial>(diffuseColor, specularColor, pow);
+        
+        result.material = material;
+    }
+    else
+    {
+        //默认材质
+        auto material = std::make_shared<BlinnPhongMaterial>(
+            glm::vec3(0.8f, 0.8f, 0.8f),
+            glm::vec3(0.5f, 0.5f, 0.5f),
+            150
+        );
+        result.material = material;
+    }
+
+    return result;
 }
