@@ -4,6 +4,7 @@
 #include "LightComponent.h"
 #include "LightUBO.h"
 #include "PBRMaterial.h"
+#include "Model.h"
 
 class Scene
 {
@@ -165,6 +166,34 @@ public:
         }
 
         lightUBO.Update(lights);
+    }
+
+    //加载模型到场景
+    GameObject* LoadModel(const std::string& filePath, const std::string& name = "")
+    {
+        std::shared_ptr<Model> model = std::make_shared<Model>();
+
+        if (!model->Load(filePath))
+        {
+            std::cerr << "Failed to load model : " << filePath << std::endl;
+            return nullptr;
+        }
+
+        //创建父物体
+        std::string modelName = name.empty() ? model->GetName() : name;
+        GameObject* parent = CreateGameObject(modelName);
+
+        //为每个子网格创建GO
+        for (const ModelMesh& modelMesh : model->GetMeshes())
+        {
+            GameObject* child = CreateGameObject(modelMesh.name);
+            child->GetTransform().SetPosition(glm::vec3(0.0f));
+            
+            MeshRenderer* renderer = child->AddComponent<MeshRenderer>(modelMesh.mesh, modelMesh.material);
+            m_MeshRenderers.push_back(renderer);
+        }
+        
+        return parent;
     }
 
 private:

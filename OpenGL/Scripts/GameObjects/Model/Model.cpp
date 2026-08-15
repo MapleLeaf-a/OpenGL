@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-bool Model::Load(const std::string &path)
+bool Model::Load(const std::string &filePath)
 {
     Assimp::Importer importer;
 
@@ -15,7 +15,7 @@ bool Model::Load(const std::string &path)
         aiProcess_SortByPType |          // 按图元类型排序
         aiProcess_ImproveCacheLocality;  // 改善缓存局部性
 
-    const aiScene* scene = importer.ReadFile(path, flags);
+    const aiScene* scene = importer.ReadFile(filePath, flags);
 
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE  //检查这个模型文件是否残缺,如果mFlags里包含AI_SCENE_FLAGS_INCOMPLETE这个标记,说明文件损坏或读取出错
         || !scene->mRootNode) //模型里的物体是有层级结构的,mRootNode就是这棵层级树的树根,由它能找到模型里所有的子节点
@@ -24,12 +24,20 @@ bool Model::Load(const std::string &path)
         return false;
     }
 
-    size_t lastSlash = path.find_last_of("/\\"); //从后往前找第一个/或\(两个\第一个是转义)
-    size_t lastDot = path.find_last_of(".");
+    size_t lastSlash = filePath.find_last_of("/\\"); //从后往前找第一个/或\(两个\第一个是转义)
+    size_t lastDot = filePath.find_last_of(".");
     if (lastSlash != std::string::npos)
-        m_Name = path.substr(lastSlash + 1, lastDot - lastSlash - 1); //截取模型文件的名字
+        m_Name = filePath.substr(lastSlash + 1, lastDot - lastSlash - 1); //截取模型文件的名字
     else 
-        m_Name = path.substr(0, lastDot);
+        m_Name = filePath.substr(0, lastDot);
+
+    //递归处理节点
+    ProcessNode(scene->mRootNode, scene);
+
+    std::cout << "Loaded model: " << m_Name 
+              << " (" << m_Meshes.size() << " meshes)" << std::endl;
+    
+    return true;
 }
 
 void Model::ProcessNode(aiNode* node, const aiScene* scene)
@@ -81,12 +89,13 @@ ModelMesh Model::ProcessMesh(aiMesh *mesh, const aiScene *scene)
     std::vector<unsigned int> indices;
     indices.resize(mesh->mNumFaces * 3); //mesh->mNumFaces三角形面的数量
 
+    unsigned int offset = 0;
     for (unsigned int i = 0; i < mesh->mNumFaces; i++)
     {
         aiFace face = mesh->mFaces[i]; //mFaces面数组（每个面包含顶点索引）
         for (unsigned int j = 0; j < face.mNumIndices; j++) //mNumIndices这个面包含的顶点数（三角形是 3）
         {
-            indices[i] = face.mIndices[j];
+            indices[offset++] = face.mIndices[j];
         }
     }
 
@@ -100,18 +109,18 @@ ModelMesh Model::ProcessMesh(aiMesh *mesh, const aiScene *scene)
         /*scene->mMaterials	aiMaterial**	所有材质的数组（色卡）	用 mesh->mMaterialIndex 做索引取材质*/ 
         
         //Kd,漫反射
-        aiColor3D diffuseColor();
+        aiColor3D diffuseColor{};
         aiMat->Get(AI_MATKEY_COLOR_DIFFUSE, diffuseColor);
 
         //Ks,镜面反射
-        aiColor3D specularColor();
+        aiColor3D specularColor{};
         aiMat->Get(AI_MATKEY_COLOR_SPECULAR, specularColor);
 
         //ksPow
         float pow = 150.0f;
         aiMat->Get(AI_MATKEY_SHININESS, pow);
 
-        auto material = std::make_shared<BlinnPhongMaterial>(diffuseColor, specularColor, pow);
+        auto material = std::make_shared<BlinnPhongMaterial>(glm::vec3(diffuseColor.r, diffuseColor.g, diffuseColor.b), glm::vec3(specularColor.r, specularColor.g, specularColor.b), (int)pow);
         
         result.material = material;
     }
