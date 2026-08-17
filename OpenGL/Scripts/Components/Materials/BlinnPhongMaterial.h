@@ -11,7 +11,7 @@ public:
 
     void SetKd(const glm::vec3& kd) { m_Kd = kd; }
     void SetKs(const glm::vec3& ks) { m_Ks = ks; }
-    void SetKsPow(float pow) { m_KsPow = pow; }
+    void SetKsPow(int pow) { m_KsPow = pow; }
 
     //将材质属性应用到着色器中
     void Apply(Shader& shader) const override

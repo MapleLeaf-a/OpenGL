@@ -1,0 +1,92 @@
+{
+    "tasks": [
+        {
+            "type": "shell",
+            "label": "C/C++: cl.exe 生成 OpenGL.exe",
+            "command": "cmd.exe",
+            "args": [
+                "/c",
+                "for /f \"tokens=*\" %i in ('\"%ProgramFiles(x86)%\\Microsoft Visual Studio\\Installer\\vswhere.exe\" -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath') do @call \"%i\\VC\\Auxiliary\\Build\\vcvarsall.bat\" x64 && cl.exe",
+                "/Zi",
+                "/EHsc",
+                "/nologo",
+                "/std:c++20",
+                "/DGLEW_STATIC",
+                "/MD",
+                "/utf-8",
+
+                "/I",
+                "${workspaceFolder}\\OpenGL\\Scripts",
+                "/I",
+                "${workspaceFolder}\\OpenGL\\Scripts\\vendor",
+                "/I",
+                "${workspaceFolder}\\OpenGL\\Scripts\\Components",
+                "/I",
+                "${workspaceFolder}\\OpenGL\\Scripts\\Components\\Materials",
+                "/I",
+                "${workspaceFolder}\\OpenGL\\Scripts\\GameObjects",
+                "/I",
+                "${workspaceFolder}\\OpenGL\\Scripts\\GameObjects\\Model",
+                "/I",
+                "${workspaceFolder}\\OpenGL\\Scripts\\Scene",
+                "/I",
+                "${workspaceFolder}\\OpenGL\\Scripts\\Render",
+                "/I",
+                "${workspaceFolder}\\OpenGL\\Scripts\\Light",
+                "/I",
+                "${workspaceFolder}\\Dependencies\\GLFW\\include",
+                "/I",
+                "${workspaceFolder}\\Dependencies\\GLEW\\include",
+                "/I",
+                "${workspaceFolder}\\Dependencies\\assimp\\include",
+
+                "${workspaceFolder}\\OpenGL\\Scripts\\Main.cpp",
+                "${workspaceFolder}\\OpenGL\\Scripts\\Render\\Renderer.cpp",
+                "${workspaceFolder}\\OpenGL\\Scripts\\Shader.cpp",
+                "${workspaceFolder}\\OpenGL\\Scripts\\Texture.cpp",
+                "${workspaceFolder}\\OpenGL\\Scripts\\IndexBuffer.cpp",
+                "${workspaceFolder}\\OpenGL\\Scripts\\VertexArray.cpp",
+                "${workspaceFolder}\\OpenGL\\Scripts\\VertexBuffer.cpp",
+                "${workspaceFolder}\\OpenGL\\Scripts\\Components\\Component.cpp",
+                "${workspaceFolder}\\OpenGL\\Scripts\\Components\\Mesh.cpp",
+                "${workspaceFolder}\\OpenGL\\Scripts\\GameObjects\\Model\\Model.cpp",
+                "${workspaceFolder}\\OpenGL\\Scripts\\vendor\\imgui\\imgui.cpp",
+                "${workspaceFolder}\\OpenGL\\Scripts\\vendor\\imgui\\imgui_demo.cpp",
+                "${workspaceFolder}\\OpenGL\\Scripts\\vendor\\imgui\\imgui_draw.cpp",
+                "${workspaceFolder}\\OpenGL\\Scripts\\vendor\\imgui\\imgui_tables.cpp",
+                "${workspaceFolder}\\OpenGL\\Scripts\\vendor\\imgui\\imgui_widgets.cpp",
+                "${workspaceFolder}\\OpenGL\\Scripts\\vendor\\imgui\\imgui_impl_glfw.cpp",
+                "${workspaceFolder}\\OpenGL\\Scripts\\vendor\\imgui\\imgui_impl_opengl3.cpp",
+                "${workspaceFolder}\\OpenGL\\Scripts\\vendor\\stb_image\\stb_image.cpp",
+
+                "/Fe${workspaceFolder}\\OpenGL\\build\\OpenGL.exe",
+
+                "/link",
+                "/LIBPATH:${workspaceFolder}\\Dependencies\\GLFW\\lib-vc2022",
+                "/LIBPATH:${workspaceFolder}\\Dependencies\\GLEW\\lib\\Release\\x64",
+                "/LIBPATH:${workspaceFolder}\\Dependencies\\assimp\\lib-vc2022",
+                "glfw3.lib",
+                "opengl32.lib",
+                "gdi32.lib",
+                "user32.lib",
+                "shell32.lib",
+                "glew32s.lib",
+                "assimp.lib",
+                "zlibstatic.lib",
+                "legacy_stdio_definitions.lib"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}",
+                "shell": {
+                    "executable": "cmd.exe"
+                }
+            },
+            "problemMatcher": ["$msCompile"],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ],
+    "version": "2.0.0"
+}

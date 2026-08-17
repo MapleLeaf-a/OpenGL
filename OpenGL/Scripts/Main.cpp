@@ -86,14 +86,14 @@ int main(void)
 
     CameraComponent* cameraComp = mainCamera->GetComponent<CameraComponent>();
 
-    // GameObject* cube = scene.CreateCube<BlinnPhongMaterial>("Cube", glm::vec3(0.0f, 0.6f, 0.6f), glm::vec3(1.0f), 200);
-    // cube->GetTransform().SetPosition(glm::vec3(1.0f, 2.0f, 5.0f));
+    GameObject* cube = scene.CreateCube<BlinnPhongMaterial>("Cube", glm::vec3(0.0f, 0.6f, 0.6f), glm::vec3(1.0f), 200);
+    cube->GetTransform().SetPosition(glm::vec3(1.0f, 2.0f, 5.0f));
 
     GameObject* plane = scene.CreatePlane<BlinnPhongMaterial>("Plane", 10.0f, glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(1.0f), 200);
     plane->GetTransform().SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 
-    // GameObject* sphere = scene.CreateSphere<BlinnPhongMaterial>("Sphere", 48, glm::vec3(0.8f, 0.2f, 0.2f), glm::vec3(1.0f), 200);
-    // sphere->GetTransform().SetPosition(glm::vec3(0.0f, 1.0f, 3.0f));
+    GameObject* sphere = scene.CreateSphere<BlinnPhongMaterial>("Sphere", 48, glm::vec3(0.8f, 0.2f, 0.2f), glm::vec3(1.0f), 200);
+    sphere->GetTransform().SetPosition(glm::vec3(0.0f, 1.0f, 3.0f));
 
     GameObject* kazuha = scene.LoadModel("../Resources/Models/Kazuha/KAZUHA.fbx", "Kazuha");
     kazuha->GetTransform().SetPosition(glm::vec3(0.0f, 5.0f, 0.0f));

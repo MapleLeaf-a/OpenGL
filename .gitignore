@@ -58,7 +58,6 @@ OpenGL/Release/
 *.ipch
 *.db-shm
 *.db-wal
-*.filters
 *.vcxproj.user
 DocumentLayout.json
 DocumentLayout.backup.json
@@ -67,3 +66,11 @@ fileList.bin
 # 其他
 imgui.ini
 vc140.pdb
+
+# 手动构建输出目录
+build/
+OpenGL/build/
+
+# 允许提交 .vscode（覆盖全局忽略，使 tasks.json / launch.json / c_cpp_properties.json 可随仓库共享）
+!.vscode/
+!.vscode/*

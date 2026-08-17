@@ -189,6 +189,8 @@ public:
             GameObject* child = CreateGameObject(modelMesh.name);
             child->GetTransform().SetPosition(glm::vec3(0.0f));
             
+            child->SetParent(parent);
+
             MeshRenderer* renderer = child->AddComponent<MeshRenderer>(modelMesh.mesh, modelMesh.material);
             m_MeshRenderers.push_back(renderer);
         }
