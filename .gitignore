@@ -26,6 +26,10 @@
 *.a
 *.lib
 
+# —— 例外：Dependencies 下的静态库必须随仓库提交（GLFW / GLEW / assimp 均为静态链接，
+#    若不提交，克隆仓库后缺少 .lib 文件将无法编译链接）——
+!Dependencies/**/*.lib
+
 # Executables
 *.exe
 *.out
@@ -74,3 +78,12 @@ OpenGL/build/
 # 允许提交 .vscode（覆盖全局忽略，使 tasks.json / launch.json / c_cpp_properties.json 可随仓库共享）
 !.vscode/
 !.vscode/*
+
+# Dependencies 中非编译必需的文件（项目仅用 x64 静态链接，这些保持忽略以精简仓库）
+Dependencies/GLEW/bin/
+Dependencies/GLEW/lib/Release/Win32/
+
+# GLEW 静态库位于 lib/Release/x64 下；上面的 Release/ 规则会忽略该目录，
+# 必须在此处（Release/ 规则之后）重新包含，否则无法提交编译所需的 .lib
+!Dependencies/GLEW/lib/Release/
+!Dependencies/GLEW/lib/Release/x64/
