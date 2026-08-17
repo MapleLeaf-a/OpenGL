@@ -2,6 +2,8 @@
 
 一个基于 **OpenGL 4.2 Core** 手写实现的轻量级 3D 渲染引擎项目（不使用现成引擎，纯手动管理 OpenGL 状态与资源），使用 **C++20** 编写。项目采用类似 Unity 的 **GameObject-Component（ECS 变体）** 架构，支持场景管理、多种材质、多光源（UBO 批量上传）、assimp 模型加载以及 ImGui 调试界面。
 
+![运行示例](./ReadmeImages/Result.png)
+
 ---
 
 ## 功能特性
@@ -119,6 +121,7 @@ OpenGL(Manually)/
 
 1. 打开根目录 `OpenGL.sln`（或 `OpenGL/OpenGL.sln`）；
 2. 选择 `x64` 平台，构建并运行。
+3. 注意必须要使用**Release**而不是Debug进行编译(如图)![](./ReadmeImages/Release.png)
 
 ---
 
