@@ -28,7 +28,7 @@ public:
         if (parent)
         {    
             parent->AddChild(this); //把自己加入新父物体的子列表
-            // m_Transform.SetParent(&parent->GetTransform());
+            m_Transform.SetParent(&parent->GetTransform()); //设置Transform的父子依赖关系
         }
     }
     GameObject* GetParent() const { return m_Parent; }

@@ -34,8 +34,8 @@ public:
         if (!transform) return glm::mat4(1.0f); //如果没有Transform组件,返回单位矩阵
         
         glm::vec3 pos = transform->GetPosition();
-        glm::vec3 forward = transform->GetForward();
-        glm::vec3 up = transform->GetUp();
+        glm::vec3 forward = transform->GetWorldForward();
+        glm::vec3 up = transform->GetWorldUp();
 
         return glm::lookAt(pos, pos + forward, up);
     }

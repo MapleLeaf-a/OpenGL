@@ -22,13 +22,13 @@ public:
     glm::vec3 GetPosition() const
     {
         Transform* trans = GetTransform();
-        return trans ? trans->GetPosition() : glm::vec3(0.0f);
+        return trans ? trans->GetWorldPosition() : glm::vec3(0.0f);  //修改这里为获取worldPosition,以让点光源的Position能继承父物体的变换
     }
 
     glm::vec3 GetDirection() const
     {
         Transform* trans = GetTransform();
-        return trans ? trans->GetForward() : glm::vec3(0.0f); //获取Forward作为方向光的方向
+        return trans ? trans->GetWorldForward() : glm::vec3(0.0f); //获取Forward作为方向光的方向
     }
 
     const LightData& GetLightData()
