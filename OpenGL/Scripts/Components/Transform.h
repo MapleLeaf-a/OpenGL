@@ -9,7 +9,7 @@ class Transform
 public:
 	Transform() : m_Position(0.0f),
 	 m_Rotation(glm::quat(1.0f, 0.0f, 0.0f, 0.0f)),
-	 m_Scale(1.0f) { UpdateModelMatrix(); }
+	 m_Scale(1.0f), m_Parent(nullptr), m_Dirty(true) { UpdateModelMatrix(); }
 
 	Transform(const glm::vec3& position, const glm::quat& quaternion, const glm::vec3& scale)
 		: m_Position(position), m_Rotation(quaternion), m_Scale(scale) { UpdateModelMatrix(); }
@@ -33,7 +33,7 @@ public:
 	void SetRotation(const glm::vec3& eulerDegrees)
 	{
 		glm::quat qx = glm::angleAxis(glm::radians(eulerDegrees.x), glm::vec3(1, 0, 0)); //用x(归一化的)轴和一个弧度角构建一个四元数
-		glm::quat qy = glm::angleAxis(glm::radians(eulerDegrees.y), glm::vec3(0, 1, 0));
+		glm::quat qy = glm::angleAxis(glm::radians(-eulerDegrees.y), glm::vec3(0, 1, 0));
 		glm::quat qz = glm::angleAxis(glm::radians(eulerDegrees.z), glm::vec3(0, 0, 1));
 		m_Rotation = qz * qy * qx; //依次左乘应用变换
 		m_Dirty = true; 
@@ -45,7 +45,12 @@ public:
 		m_Dirty = true;
 	}
 	//获取欧拉角,因为是临时局部变量不能返回引用,只能拷贝
-	glm::vec3 GetEulerAngles() const { return glm::degrees( glm::eulerAngles(m_Rotation) ); }
+	glm::vec3 GetEulerAngles() const 
+	{
+		glm::vec3 euler = glm::degrees( glm::eulerAngles(m_Rotation) );
+		euler.y = -euler.y;
+		return euler;
+	}
 
 	//设置Scale
 	void SetScale(const glm::vec3& scale) 
@@ -80,39 +85,58 @@ public:
 		{
             UpdateModelMatrix();
         }
-        return m_modelMatrix;
+        return m_WorldMatrix;
     }
 
 	//用四元数旋转
 	void Rotate(const glm::quat& quat)
 	{
-		m_Rotation = quat * m_Rotation;
+		m_Rotation = quat * m_Rotation; //左乘,沿世界坐标系作用旋转
 		m_Dirty = true;
 	}
 	//用轴角旋转
 	void Rotate(const glm::vec3& axis, float angleDegrees)
 	{
-		glm::quat quat = glm::angleAxis(glm::radians(angleDegrees), glm::normalize(axis));
+		glm::vec3 a(axis.x, -axis.y, axis.z);
+		glm::quat quat = glm::angleAxis(glm::radians(angleDegrees), glm::normalize(a));
 		Rotate(quat);
 	}
 
 	//获取矩阵是否需要更新的标志
 	bool GetDirty() { return m_Dirty; }
 
+	//获取局部矩阵
+	glm::mat4 GetLocalMatrix() const
+	{
+		glm::mat4 translation = glm::translate(glm::mat4(1.0f), m_Position);
+        glm::mat4 rotation = glm::mat4_cast(m_Rotation); //将四元数转换成4*4矩阵,有具体的数学公式,不需要再调用sin cos计算,效率更高
+		glm::mat4 scale = glm::scale(glm::mat4(1.0f), m_Scale);
+		return translation * rotation * scale;
+	}
+
 private:
 	void UpdateModelMatrix() 
 	{
-        glm::mat4 translation = glm::translate(glm::mat4(1.0f), m_Position);
-        glm::mat4 rotation = glm::mat4_cast(m_Rotation); //将四元数转换成4*4矩阵,有具体的数学公式,不需要再调用sin cos计算,效率更高
-		glm::mat4 scale = glm::scale(glm::mat4(1.0f), m_Scale);
-        m_modelMatrix = translation * rotation * scale;
+		glm::mat4 local = GetLocalMatrix();
+
+		if (m_Parent) //有父物体
+		{
+			m_WorldMatrix = m_Parent->GetLocalMatrix() * local; //左乘应用父物体的ModelMatrix
+		}
+		else
+		{
+			m_WorldMatrix = local;
+		}
+
         m_Dirty = false;
     }
 
-	glm::mat4 m_modelMatrix;
+	glm::mat4 m_WorldMatrix; //世界矩阵
 	glm::quat m_Rotation;   //四元数存储旋转,计算量更小且避免万向锁
 	glm::vec3 m_Position;
 	glm::vec3 m_Scale;
+
+	Transform* m_Parent;
 	
 	bool m_Dirty;
 };

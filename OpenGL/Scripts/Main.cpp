@@ -96,8 +96,8 @@ int main(void)
     sphere->GetTransform().SetPosition(glm::vec3(0.0f, 1.0f, 3.0f));
 
     GameObject* kazuha = scene.LoadModel("../Resources/Models/Kazuha/KAZUHA.fbx", "Kazuha");
-    kazuha->GetTransform().SetPosition(glm::vec3(0.0f, 5.0f, 0.0f));
-    kazuha->GetTransform().SetRotation(glm::vec3(90.0f, 0.0f, 0.0f));
+    kazuha->GetTransform().SetPosition(glm::vec3(0.0f, 2.0f, 0.0f));
+    kazuha->GetTransform().SetRotation(glm::vec3(-90.0f, 0.0f, 0.0f));
 
     //着色器相关
     std::string vertFilePath = "Shaders/vert.shader";
@@ -138,9 +138,9 @@ int main(void)
 
     Transform& camTransform = mainCamera->GetTransform();
 
-    float lastX = camTransform.GetEulerAngles().r;
-    float lastY = camTransform.GetEulerAngles().g;
-    float lastZ = camTransform.GetEulerAngles().b;
+    float lastX = camTransform.GetEulerAngles().x;
+    float lastY = camTransform.GetEulerAngles().y;
+    float lastZ = camTransform.GetEulerAngles().z;
     float x = lastX;
     float y = lastY;
     float z = lastZ;
