@@ -99,9 +99,10 @@ int main(void)
     kazuha->GetTransform().SetPosition(glm::vec3(0.0f, 2.0f, 0.0f));
     kazuha->GetTransform().SetRotation(glm::vec3(-90.0f, 0.0f, 0.0f));
 
-    GameObject* cubeParent = scene.CreateGameObject();
-    cubeParent->GetTransform().SetPosition(glm::vec3(-1.0f, -2.0f, -5.0f));
-    cube->SetParent(cubeParent);
+    GameObject* firefly = scene.LoadModel("../Resources/Models/Firefly/firefly.fbx", "firefly");
+    firefly->GetTransform().SetPosition(glm::vec3(2.0f, 2.0f, 0.0f));
+    firefly->GetTransform().SetRotation(glm::vec3(-90.0f, 0.0f, 0.0f));
+    firefly->GetTransform().SetScale(glm::vec3(0.1f, 0.1f, 0.1f));
 
     //着色器相关
     std::string vertFilePath = "Shaders/vert.shader";
@@ -126,19 +127,19 @@ int main(void)
     LightUBO lightUBO;
     GameObject* light = scene.CreateDirectionalLight("DirectionalLight", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), 2.0f);
     light->GetTransform().SetPosition(glm::vec3(0.0f, 5.0f, 7.0f));
-    light->GetTransform().SetRotation(glm::vec3(0.0f, 0.0f, 0.0f));
-    // light->GetTransform().SetRotation(glm::vec3(-30.0f, 0.0f, 0.0f));
+    // light->GetTransform().SetRotation(glm::vec3(0.0f, 0.0f, 0.0f));
+    light->GetTransform().SetRotation(glm::vec3(-30.0f, 0.0f, 0.0f));
 
     GameObject* pointLight = scene.CreatePointLight("PointLight", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), 10.0f);
     pointLight->GetTransform().SetPosition(glm::vec3(0.0f, 5.0f, 0.0f));
 
-    GameObject* dirLightParent = scene.CreateGameObject();
-    dirLightParent->GetTransform().SetRotation(glm::vec3(-30.0f, 0.0f, 0.0f));
-    light->SetParent(dirLightParent);
+    // GameObject* dirLightParent = scene.CreateGameObject();
+    // dirLightParent->GetTransform().SetRotation(glm::vec3(-30.0f, 0.0f, 0.0f));
+    // light->SetParent(dirLightParent);
 
-    GameObject* pointLightParent = scene.CreateGameObject();
-    pointLightParent->GetTransform().SetPosition(glm::vec3(0.0f, 5.0f, 7.0f));
-    pointLight->SetParent(pointLightParent);
+    // GameObject* pointLightParent = scene.CreateGameObject();
+    // pointLightParent->GetTransform().SetPosition(glm::vec3(0.0f, 5.0f, 7.0f));
+    // pointLight->SetParent(pointLightParent);
 
     Renderer renderer;
 

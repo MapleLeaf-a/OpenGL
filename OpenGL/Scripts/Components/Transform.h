@@ -76,6 +76,8 @@ public:
         return glm::vec3(world[3][0], world[3][1], world[3][2]);
     }
 
+
+
 	//获取本地坐标系的前方(看向-z方向)
 	glm::vec3 GetForward() const
 	{
@@ -116,6 +118,7 @@ public:
         return glm::normalize(glm::vec3(world * glm::vec4(0, 1, 0, 0)));
     }
 
+	//获取世界坐标系下的Model矩阵
 	const glm::mat4& GetModelMatrix() 
 	{
         if (m_Dirty) 
@@ -158,7 +161,7 @@ private:
 
 		if (m_Parent) //有父物体
 		{
-			m_WorldMatrix = m_Parent->GetLocalMatrix() * local; //左乘应用父物体的ModelMatrix
+			m_WorldMatrix = m_Parent->GetModelMatrix() * local; //左乘应用父物体的ModelMatrix
 		}
 		else
 		{
