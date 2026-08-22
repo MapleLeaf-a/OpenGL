@@ -2,6 +2,8 @@
 
 #include "stb_image/stb_image.h"
 
+#include <iostream>
+
 Texture::Texture(const std::string& path)
 	: m_RendererID(0), m_FilePath(path), m_LocalBuffer(nullptr), m_Width(0), m_Height(0), m_BPP(0)
 {
@@ -9,6 +11,11 @@ Texture::Texture(const std::string& path)
 	//对图像来说,原点(0,0)是左上角,而OpenGL原点在左下,故需要垂直翻转,否则会上下颠倒
 
 	m_LocalBuffer = stbi_load(path.c_str(), &m_Width, &m_Height, &m_BPP, 4); //加载时会填写2~4,最后一个参数表示加载几个通道(4:RGBA)
+
+	if (!m_LocalBuffer) {
+		const char* error = stbi_failure_reason();
+		std::cout << "stbi_load failed: " << (error ? error : "unknown") << std::endl;
+	}
 
 	GLCall(glGenTextures(1, &m_RendererID));
 	GLCall(glBindTexture(GL_TEXTURE_2D, m_RendererID));

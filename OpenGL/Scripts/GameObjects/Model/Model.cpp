@@ -29,10 +29,16 @@ bool Model::Load(const std::string &filePath)
     size_t lastSlash = filePath.find_last_of("/\\"); //从后往前找第一个/或\(两个\第一个是转义)
     size_t lastDot = filePath.find_last_of(".");
     if (lastSlash != std::string::npos)
+    {
         m_Name = filePath.substr(lastSlash + 1, lastDot - lastSlash - 1); //截取模型文件的名字
+        m_ModelDirectory = filePath.substr(0, lastSlash + 1);
+    }
     else 
+    {
         m_Name = filePath.substr(0, lastDot);
-
+        m_ModelDirectory = "";
+    }
+    
     m_Materials.resize(scene->mNumMaterials);
     for (unsigned int i = 0; i < scene->mNumMaterials; i++)
     {
@@ -136,7 +142,7 @@ std::shared_ptr<Material> Model::ProcessMaterial(aiMaterial* aiMat, const aiScen
     aiMat->Get(AI_MATKEY_COLOR_SPECULAR, specularColor);
 
     //ksPow
-    float pow = 150.0f;
+    float pow = 25.0f;
     aiMat->Get(AI_MATKEY_SHININESS, pow);
 
     std::shared_ptr<BlinnPhongMaterial> material = std::make_shared<BlinnPhongMaterial>(glm::vec3(diffuseColor.r, diffuseColor.g, diffuseColor.b), glm::vec3(specularColor.r, specularColor.g, specularColor.b), (int)pow);   
@@ -145,7 +151,11 @@ std::shared_ptr<Material> Model::ProcessMaterial(aiMaterial* aiMat, const aiScen
     aiString texturePath;
     if (aiMat->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath) == AI_SUCCESS) //获取漫反射贴图的第0套贴图(一般0是主贴图)
     {
-        std::string path = texturePath.C_Str();
+        std::string path = texturePath.C_Str();  //这个是相对路径
+
+        path = m_ModelDirectory + path; //一定要拼接出完整路径！否则stb Load会加载失败
+
+        std::cout << "Trying to load: " << path << std::endl;
 
         std::shared_ptr<Texture> texture = std::make_shared<Texture>(path);
 

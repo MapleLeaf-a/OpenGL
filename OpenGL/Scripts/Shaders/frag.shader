@@ -13,6 +13,9 @@ uniform vec3 u_Ks;
 const vec3 u_Ka = vec3(0.05f);
 uniform int u_KsPow;
 
+uniform sampler2D u_Texture; //贴图
+uniform int u_HasTexture; //1表示有纹理,0表无
+
 
 //相机相关
 uniform vec3 u_ViewPos;
@@ -38,6 +41,10 @@ layout(location = 0) out vec4 color;
 
 vec4 BlinnPhong(Light light)
 {
+    vec3 baseColor = u_Kd;
+    if (u_HasTexture == 1) baseColor = texture2D(u_Texture, v_TexCoord).xyz;
+
+
     vec3 Ld, Ls;
 
     float attenuation = light.intensity; //衰减
@@ -58,7 +65,7 @@ vec4 BlinnPhong(Light light)
 
     vec3 n = normalize(v_Normal);
     
-    Ld = u_Kd * attenuation * max(0, dot(n, l)); 
+    Ld = baseColor * attenuation * max(0, dot(n, l)); 
 
     vec3 v = normalize(u_ViewPos - v_Pos);
     vec3 h = normalize(v + l);

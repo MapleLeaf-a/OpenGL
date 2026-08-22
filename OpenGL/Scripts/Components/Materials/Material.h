@@ -20,5 +20,5 @@ public:
     std::shared_ptr<Texture> GetDiffuseTexture() const { return m_Texture; }
 
 protected:
-    std::shared_ptr<Texture> m_Texture;
+    std::shared_ptr<Texture> m_Texture = nullptr;
 };

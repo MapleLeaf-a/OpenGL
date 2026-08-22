@@ -41,7 +41,12 @@ private:
     //
     std::shared_ptr<Material> ProcessMaterial(aiMaterial* aiMat, const aiScene* scene);
 
+    //模型名称
     std::string m_Name;
+
+    //模型所在目录
+    std::string m_ModelDirectory; 
+
     //存储模型Mesh的数组
     std::vector<ModelMesh> m_Meshes;
 

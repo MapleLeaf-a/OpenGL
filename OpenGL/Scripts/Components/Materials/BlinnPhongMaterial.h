@@ -20,9 +20,17 @@ public:
         shader.SetUniform3f("u_Ks", m_Ks);
         shader.SetUniform1i("u_KsPow", m_KsPow);
 
+        //绑定贴图
         if (m_Texture)
         {
             m_Texture->Bind(0);
+            
+            shader.SetUniform1i("u_Texture", 0);
+            shader.SetUniform1i("u_HasTexture", 1);
+        }
+        else
+        {
+            shader.SetUniform1i("u_HasTexture", 0);
         }
     }
 
