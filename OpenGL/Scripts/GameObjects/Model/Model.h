@@ -38,6 +38,13 @@ private:
     //
     ModelMesh ProcessMesh(aiMesh* mesh, const aiScene* scene);
 
+    //
+    std::shared_ptr<Material> ProcessMaterial(aiMaterial* aiMat, const aiScene* scene);
+
     std::string m_Name;
+    //存储模型Mesh的数组
     std::vector<ModelMesh> m_Meshes;
+
+    //存储该模型加载出来的所有材质
+    std::vector<std::shared_ptr<Material>> m_Materials;
 };

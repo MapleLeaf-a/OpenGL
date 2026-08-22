@@ -3,6 +3,8 @@
 
 #include <iostream>
 
+class Texture; //前向声明,因为Material中include过Texture
+
 bool Model::Load(const std::string &filePath)
 {
     Assimp::Importer importer;
@@ -31,6 +33,13 @@ bool Model::Load(const std::string &filePath)
     else 
         m_Name = filePath.substr(0, lastDot);
 
+    m_Materials.resize(scene->mNumMaterials);
+    for (unsigned int i = 0; i < scene->mNumMaterials; i++)
+    {
+        aiMaterial* aiMat = scene->mMaterials[i];
+        m_Materials[i] = ProcessMaterial(aiMat, scene);
+    }
+
     //递归处理节点
     ProcessNode(scene->mRootNode, scene);
 
@@ -40,6 +49,7 @@ bool Model::Load(const std::string &filePath)
     return true;
 }
 
+//处理节点
 void Model::ProcessNode(aiNode* node, const aiScene* scene)
 {
     for (unsigned int i = 0; i < node->mNumMeshes; i++) //node->mNumMeshes:这个节点下直接挂载的网格数量
@@ -48,6 +58,13 @@ void Model::ProcessNode(aiNode* node, const aiScene* scene)
         /*scene->mMeshes	aiMesh**	所有网格的数组（零件盒）	用 node->mMeshes[i] 做索引取数据
         node->mMeshes	unsigned int*	网格索引数组（指向 scene->mMeshes 的编号）	scene->mMeshes[node->mMeshes[i]]取出网格数据*/
         ModelMesh modelMesh = ProcessMesh(mesh, scene);
+
+        //从材质池中取出对应的材质
+        if (mesh->mMaterialIndex < m_Materials.size())
+        {
+            modelMesh.material = m_Materials[mesh->mMaterialIndex];
+        }
+
         m_Meshes.push_back(modelMesh);
     }
 
@@ -58,6 +75,7 @@ void Model::ProcessNode(aiNode* node, const aiScene* scene)
     }
 }
 
+//处理网格
 ModelMesh Model::ProcessMesh(aiMesh *mesh, const aiScene *scene)
 { //mesh 是真正的几何数据，包含顶点、索引、法线、UV 等
     ModelMesh result{};
@@ -102,38 +120,37 @@ ModelMesh Model::ProcessMesh(aiMesh *mesh, const aiScene *scene)
     //创建Mesh
     result.mesh = std::make_shared<Mesh>(vertices, indices);
 
-    //提取材质
-    if (mesh->mMaterialIndex >= 0)
-    {
-        aiMaterial* aiMat = scene->mMaterials[mesh->mMaterialIndex];
-        /*scene->mMaterials	aiMaterial**	所有材质的数组（色卡）	用 mesh->mMaterialIndex 做索引取材质*/ 
-        
-        //Kd,漫反射
-        aiColor3D diffuseColor{};
-        aiMat->Get(AI_MATKEY_COLOR_DIFFUSE, diffuseColor);
-
-        //Ks,镜面反射
-        aiColor3D specularColor{};
-        aiMat->Get(AI_MATKEY_COLOR_SPECULAR, specularColor);
-
-        //ksPow
-        float pow = 150.0f;
-        aiMat->Get(AI_MATKEY_SHININESS, pow);
-
-        auto material = std::make_shared<BlinnPhongMaterial>(glm::vec3(diffuseColor.r, diffuseColor.g, diffuseColor.b), glm::vec3(specularColor.r, specularColor.g, specularColor.b), (int)pow);
-        
-        result.material = material;
-    }
-    else
-    {
-        //默认材质
-        auto material = std::make_shared<BlinnPhongMaterial>(
-            glm::vec3(0.8f, 0.8f, 0.8f),
-            glm::vec3(0.5f, 0.5f, 0.5f),
-            150
-        );
-        result.material = material;
-    }
 
     return result;
+}
+
+//处理材质
+std::shared_ptr<Material> Model::ProcessMaterial(aiMaterial* aiMat, const aiScene* scene)
+{
+    //Kd,漫反射
+    aiColor3D diffuseColor(0.8f, 0.8f, 0.8f);
+    aiMat->Get(AI_MATKEY_COLOR_DIFFUSE, diffuseColor);
+
+    //Ks,镜面反射
+    aiColor3D specularColor(0.5f, 0.5f, 0.5f);
+    aiMat->Get(AI_MATKEY_COLOR_SPECULAR, specularColor);
+
+    //ksPow
+    float pow = 150.0f;
+    aiMat->Get(AI_MATKEY_SHININESS, pow);
+
+    std::shared_ptr<BlinnPhongMaterial> material = std::make_shared<BlinnPhongMaterial>(glm::vec3(diffuseColor.r, diffuseColor.g, diffuseColor.b), glm::vec3(specularColor.r, specularColor.g, specularColor.b), (int)pow);   
+
+    //尝试读取贴图
+    aiString texturePath;
+    if (aiMat->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath) == AI_SUCCESS) //获取漫反射贴图的第0套贴图(一般0是主贴图)
+    {
+        std::string path = texturePath.C_Str();
+
+        std::shared_ptr<Texture> texture = std::make_shared<Texture>(path);
+
+        material->SetDiffuseTexture(texture);
+    }
+
+    return material;
 }

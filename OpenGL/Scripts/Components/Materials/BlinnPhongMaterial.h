@@ -19,6 +19,11 @@ public:
         shader.SetUniform3f("u_Kd", m_Kd);
         shader.SetUniform3f("u_Ks", m_Ks);
         shader.SetUniform1i("u_KsPow", m_KsPow);
+
+        if (m_Texture)
+        {
+            m_Texture->Bind(0);
+        }
     }
 
 private:
