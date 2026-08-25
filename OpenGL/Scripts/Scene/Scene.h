@@ -233,6 +233,7 @@ public:
             rotMatrix[0] = glm::vec4(right, 0.0f);
             rotMatrix[1] = glm::vec4(up, 0.0f);
             rotMatrix[2] = glm::vec4(-lookDir, 0.0f);
+            //列主序的旋转矩阵
 
             model = model * rotMatrix;
             model = glm::scale(model, glm::vec3(0.5f)); // 图标大小  
