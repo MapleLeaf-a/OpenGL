@@ -81,14 +81,28 @@ std::shared_ptr<Mesh> Mesh::CreateCube() {
     return std::make_shared<Mesh>(vertices, indices);
 }
 
-//size是总大小
-std::shared_ptr<Mesh> Mesh::CreatePlane(float size) {
+//创建XZ平面,size是总大小
+std::shared_ptr<Mesh> Mesh::CreatePlane_XZ(float size) {
     float half = size * 0.5f;
     std::vector<Vertex> vertices = {
         {{-half, 0.0f, -half}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
         {{ half, 0.0f, -half}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},
         {{ half, 0.0f,  half}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f}},
         {{-half, 0.0f,  half}, {0.0f, 1.0f, 0.0f}, {0.0f, 1.0f}},
+    };
+    std::vector<unsigned int> indices = {0, 1, 2, 2, 3, 0};
+    return std::make_shared<Mesh>(vertices, indices);
+}
+
+//创建XY平面
+std::shared_ptr<Mesh> Mesh::CreatePlane_XY(float size) 
+{
+    float half = size * 0.5f;
+    std::vector<Vertex> vertices = {
+        {{-half, -half, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f}},  // 左下
+        {{ half, -half, 0.0f}, {0.0f, 0.0f, 1.0f}, {1.0f, 0.0f}},  // 右下
+        {{ half,  half, 0.0f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},  // 右上
+        {{-half,  half, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},  // 左上
     };
     std::vector<unsigned int> indices = {0, 1, 2, 2, 3, 0};
     return std::make_shared<Mesh>(vertices, indices);

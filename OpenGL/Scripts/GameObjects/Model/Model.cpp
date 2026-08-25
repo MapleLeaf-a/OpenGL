@@ -151,7 +151,7 @@ std::shared_ptr<Material> Model::ProcessMaterial(aiMaterial* aiMat, const aiScen
     aiString texturePath;
     if (aiMat->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath) == AI_SUCCESS) //获取漫反射贴图的第0套贴图(一般0是主贴图)
     {
-        std::string path = texturePath.C_Str();  //这个是相对路径
+        std::string path = texturePath.C_Str();  //这个是相对模型路径
 
         path = m_ModelDirectory + path; //一定要拼接出完整路径！否则stb Load会加载失败
 

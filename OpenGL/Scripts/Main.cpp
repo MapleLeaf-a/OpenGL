@@ -105,32 +105,28 @@ int main(void)
     firefly->GetTransform().SetScale(glm::vec3(0.1f, 0.1f, 0.1f));
 
     //着色器相关
-    std::string vertFilePath = "Shaders/vert.shader";
-    std::string fragFilePath = "Shaders/frag.shader";
+    std::string vertFilePath = "Shaders/BlinnPhongShaders/vert.shader";
+    std::string fragFilePath = "Shaders/BlinnPhongShaders/frag.shader";
 
     Shader shader(vertFilePath, fragFilePath);
 
-    shader.Bind();
+    
+    vertFilePath = "Shaders/GizmoShaders/vert.shader";
+    fragFilePath = "Shaders/GizmoShaders/frag.shader";
 
-    // std::string name_U4f = "u_Color";
-    // shader.SetUniform4f(name_U4f, 0.5f, 0.5f, 0.5f, 1.0f);
+    Shader gizmoShader(vertFilePath, fragFilePath);
 
-    // Texture texture("../Resources/Textures/2.png");
-    // unsigned int slot = 0;
-    // texture.Bind(slot);
-    // shader.SetUniform1i("u_Texture", slot);
-
-    shader.Unbind(); //清理绑定状态，防止后续不小心使用
-
+    Texture pointLightIcon("../Resources/Textures/Gizmos/PointLight.png");
+    Texture dirLightIcon("../Resources/Textures/Gizmos/DirLight.png");
 
     //创建LightUBO
     LightUBO lightUBO;
-    GameObject* light = scene.CreateDirectionalLight("DirectionalLight", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), 2.0f);
+    GameObject* light = scene.CreateDirectionalLight("DirectionalLight", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), 1.0f);
     light->GetTransform().SetPosition(glm::vec3(0.0f, 5.0f, 7.0f));
     // light->GetTransform().SetRotation(glm::vec3(0.0f, 0.0f, 0.0f));
     light->GetTransform().SetRotation(glm::vec3(-30.0f, 0.0f, 0.0f));
 
-    GameObject* pointLight = scene.CreatePointLight("PointLight", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), 10.0f);
+    GameObject* pointLight = scene.CreatePointLight("PointLight", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), 1.0f);
     pointLight->GetTransform().SetPosition(glm::vec3(0.0f, 5.0f, 0.0f));
 
     // GameObject* dirLightParent = scene.CreateGameObject();
@@ -185,6 +181,8 @@ int main(void)
 
         scene.RenderAllMeshRenderers(shader, renderer);
         scene.RenderAllLights(lightUBO);
+
+        scene.RenderLightGizmos(cameraComp, gizmoShader, renderer, &pointLightIcon, &dirLightIcon);
 
 
         {

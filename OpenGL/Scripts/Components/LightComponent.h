@@ -42,6 +42,8 @@ public:
         return lightData;
     }
 
+    LightType GetLightType() const { return (LightType)lightData.type; }
+
 private:
     LightData lightData;
 };

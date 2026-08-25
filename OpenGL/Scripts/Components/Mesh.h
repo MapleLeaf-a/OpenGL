@@ -35,7 +35,8 @@ public:
 
     // ---- 静态工厂方法 ----
     static std::shared_ptr<Mesh> CreateCube();
-    static std::shared_ptr<Mesh> CreatePlane(float size = 5.0f);
+    static std::shared_ptr<Mesh> CreatePlane_XZ(float size = 5.0f);
+    static std::shared_ptr<Mesh> CreatePlane_XY(float size = 5.0f);
     static std::shared_ptr<Mesh> CreateSphere(int segments = 24);
 
 private:

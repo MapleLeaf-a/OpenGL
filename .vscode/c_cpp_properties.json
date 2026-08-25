@@ -23,7 +23,7 @@
                 "GLEW_STATIC"
             ],
             "windowsSdkVersion": "10.0.26100.0",
-            "compilerPath": "cl.exe",
+            "compilerPath": "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe",
             "cStandard": "c17",
             "cppStandard": "c++20",
             "intelliSenseMode": "windows-msvc-x64"
