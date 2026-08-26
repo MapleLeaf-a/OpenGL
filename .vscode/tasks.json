@@ -1,8 +1,19 @@
 {
     "tasks": [
         {
+            "label": "创建 build 文件夹",
             "type": "shell",
+            "command": "cmd.exe",
+            "args": [
+                "/c",
+                "if not exist \"${workspaceFolder}\\OpenGL\\build\" mkdir \"${workspaceFolder}\\OpenGL\\build\""
+            ],
+            "group": "build",
+            "detail": "如果 build 文件夹不存在则创建"
+        },
+        {
             "label": "C/C++: cl.exe 生成 OpenGL.exe",
+            "type": "shell",
             "command": "cmd.exe",
             "args": [
                 "/c",
@@ -82,6 +93,7 @@
                 }
             },
             "problemMatcher": ["$msCompile"],
+            "dependsOn": ["创建 build 文件夹"],
             "group": {
                 "kind": "build",
                 "isDefault": true
