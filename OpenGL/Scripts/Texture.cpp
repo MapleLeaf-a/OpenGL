@@ -51,6 +51,14 @@ Texture::Texture(const std::string& path)
 	GL_CLAMP_TO_EDGE	边缘拉伸（更常用）	比 GL_CLAMP 更标准
 	*/
 
+	/*
+	关于glTexParameter系列函数的后缀
+	后缀	含义		 参数类型					适用场景
+	i	  Integer		 int				枚举值（GL_REPEAT、GL_LINEAR 等）
+	f	  Float			 float				单个浮点数参数（LOD Bias、LOD 范围）
+	fv	  Float Vector	 float*（数组指针）	 颜色数组、向量数组（如边框颜色）
+	iv	  Integer Vector int*（数组指针）	 整数数组（如 Swizzle 映射）*/
+
 	GLCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, m_Width, m_Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_LocalBuffer));
 	//上传纹理数据 : 将 CPU 内存中的图像数据（m_LocalBuffer）上传到 GPU 显存中，创建纹理。
 	/*参数				值					含义
