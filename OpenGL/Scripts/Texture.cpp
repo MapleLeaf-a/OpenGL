@@ -1,4 +1,5 @@
 #include "Texture.h"
+#include "Renderer.h" //提供 GLCall 宏
 
 #include "stb_image/stb_image.h"
 

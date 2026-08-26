@@ -126,8 +126,8 @@ int main(void)
     // light->GetTransform().SetRotation(glm::vec3(0.0f, 0.0f, 0.0f));
     light->GetTransform().SetRotation(glm::vec3(-30.0f, 0.0f, 0.0f));
 
-    // GameObject* pointLight = scene.CreatePointLight("PointLight", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), 1.0f);
-    // pointLight->GetTransform().SetPosition(glm::vec3(0.0f, 5.0f, 0.0f));
+    GameObject* pointLight = scene.CreatePointLight("PointLight", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), 1.0f);
+    pointLight->GetTransform().SetPosition(glm::vec3(0.0f, 5.0f, 0.0f));
 
     // GameObject* dirLightParent = scene.CreateGameObject();
     // dirLightParent->GetTransform().SetRotation(glm::vec3(-30.0f, 0.0f, 0.0f));
@@ -179,10 +179,10 @@ int main(void)
 
         shader.SetUniform3f("u_ViewPos", camTransform.GetPosition());
 
-        scene.RenderAllMeshRenderers(shader, renderer);
-        scene.RenderAllLights(lightUBO);
+        renderer.RenderAllMeshRenderers(scene, shader);
+        renderer.RenderAllLights(scene, lightUBO);
 
-        scene.RenderLightGizmos(cameraComp, gizmoShader, renderer, &pointLightIcon, &dirLightIcon);
+        renderer.RenderLightGizmos(scene, cameraComp, gizmoShader, &pointLightIcon, &dirLightIcon);
 
 
         {

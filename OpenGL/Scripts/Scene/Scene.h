@@ -3,16 +3,14 @@
 #include "GameObject.h"
 #include "LightComponent.h"
 #include "LightUBO.h"
+#include "CameraComponent.h"
 #include "PBRMaterial.h"
 #include "Model.h"
 
 class Scene
 {
 public:
-    Scene()
-    {
-        m_GizmoQuadMesh = Mesh::CreatePlane_XY(1.0f);
-    }
+    Scene() = default;
     ~Scene() = default;
     
     //禁止拷贝
@@ -53,7 +51,7 @@ public:
         return nullptr;
     }
 
-    //每帧更新所有物体
+    //每帧更新所有物体(逻辑更新)
     void OnUpdate(float deltaTime)
     {
         for (auto& obj : m_GameObjects)
@@ -62,14 +60,14 @@ public:
         }
     }
 
-    //每帧渲染所有物体
-    void OnRender()
-    {
-        for (auto& obj : m_GameObjects)
-        {
-            obj->Render();
-        }
-    }
+    // //每帧渲染所有物体
+    // void OnRender()
+    // {
+    //     for (auto& obj : m_GameObjects)
+    //     {
+    //         obj->Render();
+    //     }
+    // }
 
     //清空场景中的所有游戏物体
     void Clear()
@@ -129,14 +127,6 @@ public:
         return rawPtr;
     }
 
-    void RenderAllMeshRenderers(Shader& shader, const Renderer& renderer) const
-    {
-        for (const MeshRenderer* meshRenderer: m_MeshRenderers)
-        {
-            meshRenderer->Render(shader, renderer);
-        }
-    }
-
     GameObject* CreateDirectionalLight(const std::string& name = "DirectionalLight", glm::vec4 color = glm::vec4(1.0f), float intensity = 1.0f)
     {
         return CreateLight(name, LightType::Directional, color, intensity);
@@ -157,97 +147,7 @@ public:
         return rawPtr;
     }
 
-    void RenderAllLights(LightUBO& lightUBO)
-    {
-        if (m_Lights.empty()) return;
-
-        std::vector<LightData> lights;
-
-        for (auto& i : m_Lights)
-        {
-            lights.push_back(i->GetLightData());
-        }
-
-        lightUBO.Update(lights);
-    }
-
-    const std::vector<LightComponent*>& GetLights() { return m_Lights; }
-
-    //添加一个渲染Pass以给灯光处加一个标记
-    void RenderLightGizmos(CameraComponent* camera, Shader& gizmoShader, const Renderer& renderer, const Texture* pointLightIconTexture = nullptr, const Texture* dirLightIconTexture = nullptr)
-    {
-        if (m_Lights.empty()) return;
-
-        if (pointLightIconTexture == nullptr && dirLightIconTexture == nullptr) return;
-
-        //设置绑定shader
-        gizmoShader.Bind();
-        gizmoShader.SetUniformMat4f("u_View", camera->GetViewMatrix());
-        gizmoShader.SetUniformMat4f("u_Projection", camera->GetProjectionMatrix());
-
-        //设置渲染状态
-        glEnable(GL_BLEND); //开启透明度混合
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); //设置混合方式
-        glDisable(GL_DEPTH_TEST); //不写入深度测试
-
-        for (int i = 0; i < m_Lights.size(); i++)
-        {
-            const LightComponent* light = m_Lights[i];
-
-            LightType type = light->GetLightType();
-            switch (type)
-            {
-                case LightType::Directional:
-                    if (dirLightIconTexture != nullptr)
-                    {
-                        dirLightIconTexture->Bind(1); //和主渲染的贴图插槽区分开
-                        gizmoShader.SetUniform1i("u_IconTexture", 1);
-                    }
-                    break;
-                case LightType::Point:
-                    if (pointLightIconTexture != nullptr)
-                    {
-                        pointLightIconTexture->Bind(1); 
-                        gizmoShader.SetUniform1i("u_IconTexture", 1);
-                    }
-                    break;
-
-                default:
-                    break;
-            }
-
-            //获取光源位置
-            glm::vec3 lightPos = light->GetTransform()->GetWorldPosition();
-
-            //Billboarding(公告牌技术)矩阵计算
-            glm::mat4 model = glm::mat4(1.0f);
-
-            model = glm::translate(model, lightPos);
-
-            //让四边形始终朝向相机的-forward方向
-            glm::vec3 lookDir = glm::normalize(-camera->GetTransform()->GetForward());
-            glm::vec3 right = glm::normalize(glm::cross(lookDir, glm::vec3(0, 1, 0))); //通过叉乘lookDir和世界坐标的Up(0,1,0)得到right
-            glm::vec3 up = glm::normalize(glm::cross(right, lookDir));
-
-            glm::mat4 rotMatrix = glm::mat4(1.0f);
-            rotMatrix[0] = glm::vec4(right, 0.0f);
-            rotMatrix[1] = glm::vec4(up, 0.0f);
-            rotMatrix[2] = glm::vec4(-lookDir, 0.0f);
-            //列主序的旋转矩阵
-
-            model = model * rotMatrix;
-            model = glm::scale(model, glm::vec3(0.5f)); // 图标大小  
-
-            gizmoShader.SetUniformMat4f("u_Model", model);
-
-            m_GizmoQuadMesh->Draw(gizmoShader, renderer);
-        }
-
-        //恢复状态
-        glEnable(GL_DEPTH_TEST);
-        glDisable(GL_BLEND);
-    }
-
+    const std::vector<LightComponent*>& GetLights() const { return m_Lights; }
 
     //加载模型到场景
     GameObject* LoadModel(const std::string& filePath, const std::string& name = "")
@@ -288,7 +188,4 @@ private:
 
     //光源组件的集合
     std::vector<LightComponent*> m_Lights;
-
-    //用于承载gizmo图标的四边形Mesh
-    std::shared_ptr<Mesh> m_GizmoQuadMesh;
 };
