@@ -137,6 +137,13 @@ int main(void)
     // pointLightParent->GetTransform().SetPosition(glm::vec3(0.0f, 5.0f, 7.0f));
     // pointLight->SetParent(pointLightParent);
 
+    ShadowMap shadowMap;
+
+    vertFilePath = "Shaders/ShadowShaders/shadow_vert.shader";
+    fragFilePath = "Shaders/ShadowShaders/shadow_frag.shader";
+
+    Shader shadowShader(vertFilePath, fragFilePath);
+
     Renderer renderer;
 
 
@@ -169,6 +176,11 @@ int main(void)
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
+        //渲染深度Pass
+        renderer.RenderShadowPass(scene, light, shadowMap, shadowShader);
+
+
+        //主渲染Pass
         shader.Bind();
             
 
@@ -179,7 +191,13 @@ int main(void)
 
         shader.SetUniform3f("u_ViewPos", camTransform.GetPosition());
 
-        renderer.RenderAllMeshRenderers(scene, shader);
+        //绑定shadowmap到2号纹理槽
+        shadowMap.BindForReading(2);
+        shader.SetUniform1i("u_ShadowMap", 2);
+        shader.SetUniformMat4f("u_LightVP", light->GetComponent<LightComponent>()->GetLightVPMatrix());
+
+        //主Pass渲染,启用材质
+        renderer.RenderAllMeshRenderers(scene, shader, true);
         renderer.RenderAllLights(scene, lightUBO);
 
         renderer.RenderLightGizmos(scene, cameraComp, gizmoShader, &pointLightIcon, &dirLightIcon);

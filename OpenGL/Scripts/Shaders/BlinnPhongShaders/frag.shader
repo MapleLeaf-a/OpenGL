@@ -20,6 +20,11 @@ uniform int u_HasTexture; //1表示有纹理,0表无
 //相机相关
 uniform vec3 u_ViewPos;
 
+
+//阴影相关
+uniform sampler2D u_ShadowMap;
+uniform mat4 u_LightVP;
+
 struct Light
 {
     vec4 position;
@@ -38,6 +43,32 @@ layout(std140, binding = 0) uniform LightBlock // <-- 这里定义了一块内�
 } ub_Light;  //这个才是实例名
 
 layout(location = 0) out vec4 color;
+
+//计算Shadow,参数为片元的世界坐标(其实就是v_Pos)
+float CaculateShadow(vec3 fragPosWorld)
+{
+    //将片元转换到光源空间
+    vec4 fragPosLightSpace = u_LightVP * vec4(fragPosWorld, 1.0f);
+
+    //透视投影变换下的各属性会被非线性改变，需要做透视矫正(做透视除法)转到NDC[-1,1]
+    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+
+    //仿射变换,转到纹理坐标[0,1]
+    projCoords = projCoords * 0.5 + 0.5;
+
+    //采样深度
+    //最近深度
+    float closestDepth = texture2D(u_ShadowMap, projCoords.xy).r;
+    //目前深度
+    float currentDepth = projCoords.z;
+
+    //若当前深度大于最近深度,则在阴影中
+    //添加偏移减轻阴影痤疮
+    float bias = 0.005f;
+    float shadow = currentDepth - bias > closestDepth ? 1.0f : 0.0f; 
+
+    return shadow;
+}
 
 vec4 BlinnPhong(Light light)
 {
@@ -76,9 +107,11 @@ vec4 BlinnPhong(Light light)
 
 void main()
 {
+    float shadow = CaculateShadow(v_Pos);
+
     for (int i = 0; i < ub_Light.count; ++i)
     {
-        color += BlinnPhong(ub_Light.lights[i]);
+        color += (1.0f - shadow) * BlinnPhong(ub_Light.lights[i]);
     }
     color += vec4(u_Ka, 1.0f);
 }

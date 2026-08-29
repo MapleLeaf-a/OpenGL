@@ -4,6 +4,7 @@
             "name": "Win32",
             "includePath": [
                 "${workspaceFolder}/**",
+                "${workspaceFolder}/OpenGL/Scripts",
                 "${workspaceFolder}/OpenGL/Scripts/Components",
                 "${workspaceFolder}/OpenGL/Scripts/Components/Materials",
                 "${workspaceFolder}/OpenGL/Scripts/GameObjects",
@@ -11,6 +12,7 @@
                 "${workspaceFolder}/OpenGL/Scripts/Scene",
                 "${workspaceFolder}/OpenGL/Scripts/Render",
                 "${workspaceFolder}/OpenGL/Scripts/Light",
+                "${workspaceFolder}/OpenGL/Scripts/Shadow",
                 "${workspaceFolder}/OpenGL/Scripts/vendor",
                 "${workspaceFolder}/Dependencies/GLFW/include",
                 "${workspaceFolder}/Dependencies/GLEW/include",

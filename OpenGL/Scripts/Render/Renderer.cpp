@@ -3,7 +3,6 @@
 
 #include "MeshRenderer.h"
 #include "Scene.h"
-#include "Texture.h"
 
 /// <summary>
 /// 清空错误队列
@@ -56,12 +55,12 @@ void Renderer::Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& 
 }
 
 
-void Renderer::RenderAllMeshRenderers(const Scene& scene, Shader& shader) const
+void Renderer::RenderAllMeshRenderers(const Scene& scene, Shader& shader,  bool enableMaterial) const
 {
     std::vector<MeshRenderer*> meshRenderers = scene.GetMeshRenderers();
     for (const MeshRenderer* meshRenderer: meshRenderers)
     {
-        meshRenderer->Render(shader, *this);
+        meshRenderer->Render(shader, *this, enableMaterial);
     }
 }
 
@@ -155,4 +154,26 @@ void Renderer::RenderLightGizmos(const Scene& scene, CameraComponent* camera, Sh
     //恢复状态
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_BLEND);
+}
+
+void Renderer::RenderShadowPass(const Scene& scene, GameObject* light, ShadowMap& shadowMap, Shader& shadowShader)
+{
+    LightComponent* lightComp;
+    if ((!light) || (lightComp = light->GetComponent<LightComponent>()) == nullptr) return;
+
+    //绑定FBO
+    shadowMap.BindForWriting();
+
+    //绑定Shader
+    shadowShader.Bind();
+
+    //设置光源的VP矩阵
+    shadowShader.SetUniformMat4f("u_LightView", lightComp->GetLightViewMatrix());
+    shadowShader.SetUniformMat4f("u_LightProj", lightComp->GetLightProjMatrix());
+
+    //从光源视角渲染所有MeshRenderer,且不启用材质
+    RenderAllMeshRenderers(scene, shadowShader, false);
+
+    //深度渲染完成，解绑
+    shadowMap.UnbindForWriting();
 }

@@ -44,6 +44,38 @@ public:
 
     LightType GetLightType() const { return (LightType)lightData.type; }
 
+    //获取Model矩阵
+    const glm::mat4& GetLightModelMatrix()
+    {
+        Transform* trans = GetTransform();
+        return trans->GetModelMatrix();
+    }
+
+    //获取View矩阵
+    glm::mat4 GetLightViewMatrix() //不返回引用是因为要
+    {
+        Transform* trans = GetTransform();
+        
+        glm::vec3 pos = trans->GetPosition();
+        glm::vec3 forward = trans->GetForward();
+        glm::vec3 up = trans->GetUp();
+
+        return glm::lookAt(pos, pos + forward, up);
+    }
+
+    //获取Proj矩阵
+    glm::mat4 GetLightProjMatrix(float nearPlane = 0.1f, float farPlane = 100.0f)
+    {
+        //方向光用正交投影
+        float size = 20.0f;
+        return glm::ortho(-size, size, -size, size, nearPlane, farPlane);
+    }
+
+    glm::mat4 GetLightVPMatrix()
+    {
+        return GetLightProjMatrix() * GetLightViewMatrix();
+    }
+
 private:
     LightData lightData;
 };

@@ -18,9 +18,10 @@ public:
     std::shared_ptr<Mesh> GetMesh() const { return m_Mesh; }
     std::shared_ptr<Material> GetMaterial() const { return m_Material; }
 
-    void Render(Shader& shader, const Renderer& renderer) const
+    //参数含义：要使用的shader和renderer，是否启用材质
+    void Render(Shader& shader, const Renderer& renderer, bool enableMaterial) const
     {
-        if (!m_Mesh || !m_Material) return; 
+        if (!m_Mesh || (enableMaterial && !m_Material)) return; 
         
         Transform* transform = GetTransform();
         if (transform) 
@@ -28,7 +29,8 @@ public:
             shader.SetUniformMat4f("u_Model", transform->GetModelMatrix());
         }
         
-        m_Material->Apply(shader); //将材质属性应用到着色器中
+        if (enableMaterial)
+            m_Material->Apply(shader); //将材质属性应用到着色器中
         
         m_Mesh->Draw(shader, renderer); //绘制网格   
     }

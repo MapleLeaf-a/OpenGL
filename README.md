@@ -108,7 +108,7 @@ OpenGL(Manually)/
 
 项目在 `.vscode/tasks.json` 中配置了 MSVC 手动构建任务：
 
-1. 打开工作区 `OpenGL`；
+1. 打开工作区 `OpenGL`；(注意**一定**要进入OpenGL这个文件夹，保证工作区在正确的位置否则会编译失败)
 2. 按 `Ctrl+Shift+B` 执行 **`C/C++: cl.exe 生成 OpenGL.exe`** 任务；
 3. 任务通过 `cmd.exe /c` 先调用 `vcvarsall.bat x64` 再执行 `cl.exe`，不依赖终端持久环境；
 4. 输出：`OpenGL/build/OpenGL.exe`。

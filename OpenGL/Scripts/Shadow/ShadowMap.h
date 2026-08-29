@@ -10,8 +10,9 @@ public:
     ShadowMap(int width = 2048, int height = 2048)
     : m_Width(width), m_Height(height)
     {
-        //创建FBO
-        glGenBuffers(1, &m_FBO);
+        //创建FBO(注意:必须用glGenFramebuffers生成帧缓冲对象,不能用glGenBuffers!
+        //否则生成的名字可能与纹理对象冲突,导致深度渲染到错误的对象,阴影贴图采样全为0,场景全黑)
+        glGenFramebuffers(1, &m_FBO);
         glBindFramebuffer(GL_FRAMEBUFFER, m_FBO); //绑定FBO,参一为绑定目标，常用 GL_FRAMEBUFFER（读写）、GL_DRAW_FRAMEBUFFER（只写）、GL_READ_FRAMEBUFFER（只读）
 
         //创建&绑定深度纹理
@@ -59,8 +60,10 @@ public:
             std::cerr << "ShadowMap FBO incomplete!" << std::endl;
         }
 
-        //解绑
+        //解绑,并恢复默认帧缓冲的颜色读写状态(否则会污染后续主渲染,导致屏幕全黑)
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glDrawBuffer(GL_BACK);
+        glReadBuffer(GL_BACK);
     }
 
     ~ShadowMap()
@@ -72,7 +75,8 @@ public:
     //渲染深度纹理
     void BindForWriting()
     {
-        glViewport(0, 0, m_Width, m_Height); //设置画布尺寸,告诉 OpenGL 渲染区域的大小
+        glGetIntegerv(GL_VIEWPORT, m_SavedViewport); //保存当前视口(主窗口),渲染完阴影后要恢复
+        glViewport(0, 0, m_Width, m_Height); //设置画布尺寸为阴影贴图大小
         glBindFramebuffer(GL_FRAMEBUFFER, m_FBO); //把渲染目标从“屏幕”切换到“深度纹理”
         glClear(GL_DEPTH_BUFFER_BIT); //清空旧深度缓冲，防止旧数据残留
     }
@@ -81,6 +85,11 @@ public:
     void UnbindForWriting()
     {
         glBindFramebuffer(GL_FRAMEBUFFER, 0); //把渲染目标从“深度纹理”切换回“屏幕”,如果不恢复，后续所有渲染操作（比如画模型）都会被写入深度纹理，而不是显示在屏幕上
+        //恢复主窗口视口!否则后续主渲染仍按阴影贴图尺寸(如2048x2048)进行,超出窗口的部分被裁剪,导致画面错乱甚至全黑
+        glViewport(m_SavedViewport[0], m_SavedViewport[1], m_SavedViewport[2], m_SavedViewport[3]);
+        //恢复默认帧缓冲的颜色读写状态(否则主渲染不写颜色,屏幕全黑)
+        glDrawBuffer(GL_BACK);
+        glReadBuffer(GL_BACK);
     }
 
     //绑定深度纹理供主渲染Pass采样
@@ -91,6 +100,9 @@ public:
     }
 
 private:
+    //保存进入阴影Pass前的视口,渲染完阴影后恢复主窗口视口
+    GLint m_SavedViewport[4] = { 0, 0, 0, 0 };
+
     unsigned int m_FBO; //FBOFramebuffer Object，帧缓冲对象
     /* FBO（Framebuffer Object，帧缓冲对象） 是 OpenGL 提供的一个“画板”。
     默认情况下，OpenGL 的渲染结果会直接显示在屏幕上，这个默认的“画板”叫默认帧缓冲（Default Framebuffer）。

@@ -45,6 +45,8 @@
                 "/I",
                 "${workspaceFolder}\\OpenGL\\Scripts\\Light",
                 "/I",
+                "${workspaceFolder}\\OpenGL\\Scripts\\Shadow",
+                "/I",
                 "${workspaceFolder}\\Dependencies\\GLFW\\include",
                 "/I",
                 "${workspaceFolder}\\Dependencies\\GLEW\\include",
