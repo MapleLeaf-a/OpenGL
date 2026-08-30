@@ -96,7 +96,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
-<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LocalDebuggerWorkingDirectory>$(ProjectDir)Scripts</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -108,7 +108,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>GLEW_STATIC</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GLEW\include;$(SolutionDir)Dependencies\assimp\include;Scripts\vendor;Scripts;Scripts\Components;Scripts\GameObjects;Scripts\Render;Scripts\Components\Materials;Scripts\Scene;Scripts\Light;Scripts\GameObjects\Model;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GLEW\include;$(SolutionDir)Dependencies\assimp\include;Scripts\vendor;Scripts;Scripts\Components;Scripts\GameObjects;Scripts\Render;Scripts\Components\Materials;Scripts\Scene;Scripts\Light;Scripts\GameObjects\Model;Scripts\Shadow;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
@@ -127,7 +127,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>GLEW_STATIC</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GLEW\include;$(SolutionDir)Dependencies\assimp\include;Scripts\vendor;Scripts;Scripts\Components;Scripts\GameObjects;Scripts\Render;Scripts\Components\Materials;Scripts\Scene;Scripts\Light;Scripts\GameObjects\Model;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GLEW\include;$(SolutionDir)Dependencies\assimp\include;Scripts\vendor;Scripts;Scripts\Components;Scripts\GameObjects;Scripts\Render;Scripts\Components\Materials;Scripts\Scene;Scripts\Light;Scripts\GameObjects\Model;Scripts\Shadow;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
@@ -180,6 +180,7 @@
     <ClInclude Include="Scripts\Render\Renderer.h" />
     <ClInclude Include="Scripts\Scene\Scene.h" />
     <ClInclude Include="Scripts\Shader.h" />
+    <ClInclude Include="Scripts\Shadow\ShadowMap.h" />
     <ClInclude Include="Scripts\Tests\Test.h" />
     <ClInclude Include="Scripts\Tests\TestClearColor.h" />
     <ClInclude Include="Scripts\Texture.h" />
@@ -489,6 +490,12 @@
     <ClInclude Include="Scripts\Components\Transform.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Scripts\Shaders\BlinnPhongShaders\frag.shader" />
+    <None Include="Scripts\Shaders\BlinnPhongShaders\vert.shader" />
+    <None Include="Scripts\Shaders\GizmoShaders\frag.shader" />
+    <None Include="Scripts\Shaders\GizmoShaders\vert.shader" />
+    <None Include="Scripts\Shaders\ShadowShaders\shadow_frag.shader" />
+    <None Include="Scripts\Shaders\ShadowShaders\shadow_vert.shader" />
     <None Include="Scripts\vendor\glm\detail\func_common.inl" />
     <None Include="Scripts\vendor\glm\detail\func_common_simd.inl" />
     <None Include="Scripts\vendor\glm\detail\func_exponential.inl" />

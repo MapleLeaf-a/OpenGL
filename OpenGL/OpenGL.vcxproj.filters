@@ -1055,6 +1055,9 @@
     <ClInclude Include="Scripts\Scene\Scene.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Scripts\Shadow\ShadowMap.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Scripts\vendor\glm\detail\func_common.inl">
@@ -1479,5 +1482,11 @@
     </None>
     <None Include="Scripts\Shaders\frag.shader" />
     <None Include="Scripts\Shaders\vert.shader" />
+    <None Include="Scripts\Shaders\BlinnPhongShaders\frag.shader" />
+    <None Include="Scripts\Shaders\BlinnPhongShaders\vert.shader" />
+    <None Include="Scripts\Shaders\GizmoShaders\vert.shader" />
+    <None Include="Scripts\Shaders\GizmoShaders\frag.shader" />
+    <None Include="Scripts\Shaders\ShadowShaders\shadow_frag.shader" />
+    <None Include="Scripts\Shaders\ShadowShaders\shadow_vert.shader" />
   </ItemGroup>
 </Project>
