@@ -28,6 +28,9 @@
 - 6. **调试友好**
   - `GLCall` / `GLClearError` / `GLPrintError` + `ASSERT` 宏，OpenGL 错误自动定位到文件与行号并触发断点
 - 7. **纯手写资源管线**：`VertexBuffer` / `IndexBuffer` / `VertexArray` / `Shader` / `Texture` 封装
+- 8. **模型加载（assimp）**：加载 FBX 等外部模型，支持多子网格拆分与贴图自动加载（拼接模型相对路径解决 assimp 相对路径问题）
+- 9. **光源图标 Billboard（公告牌）**：光源标记图标四边形始终面向相机，区分方向光 / 点光源，视觉上直观定位光源
+- 10. **硬阴影（Shadow Mapping）**：方向光阴影映射，先渲染深度 Pass 生成阴影贴图，主 Pass 采样阴影贴图实现实时阴影
 
 ---
 
@@ -85,9 +88,12 @@ OpenGL(Manually)/
 │       │   └── LightUBO.h          # 光源 UBO（std140 布局批量上传）
 │       ├── Scene/
 │       │   └── Scene.h             # 场景（物体管理 + 快捷创建）
+│       ├── Shadow/
+│       │   └── ShadowMap.h         # 阴影贴图（FBO + 深度纹理，保存/恢复视口）
 │       ├── Shaders/
-│       │   ├── vert.shader         # 顶点着色器
-│       │   └── frag.shader         # 片元着色器（Blinn-Phong + 多光源 UBO）
+│       │   ├── BlinnPhongShaders/  # 主渲染着色器（Blinn-Phong + 多光源 UBO + 阴影采样）
+│       │   ├── GizmoShaders/       # 光源图标（Billboard）着色器
+│       │   └── ShadowShaders/      # 阴影深度 Pass 着色器
 │       └── vendor/                 # 第三方源码（glm / imgui / stb_image）
 └── build/                          # 根级构建输出目录
 ```
@@ -130,8 +136,8 @@ OpenGL(Manually)/
 启动后程序会：
 
 1. 创建 1920×1080 窗口并初始化 OpenGL 4.x 上下文；
-2. 搭建场景：主相机 + 平面（Blinn-Phong）+ 通过 assimp 加载的 `KAZUHA.fbx` 模型 + 一个球和立方体 + 方向光 / 点光源；
-3. 进入渲染主循环，同时显示 ImGui 调试面板。
+2. 搭建场景：主相机 + 平面（Blinn-Phong）+ 通过 assimp 加载的 `KAZUHA.fbx` / `firefly.fbx` 模型 + 球和立方体 + 方向光 / 点光源；
+3. 进入渲染主循环：每帧先执行阴影深度 Pass（硬阴影），再做主渲染 Pass 并采样阴影贴图，随后绘制光源图标（Billboard），最后叠加 ImGui 调试面板。
 
 **ImGui 面板（"Camera Transform"）**
 
@@ -179,11 +185,17 @@ graph TD
 - **材质与网格分离**：`MeshRenderer` 组合 `Mesh` + `Material`；`Mesh::CreateCube/Plane/Sphere` 程序化生成顶点数据。
 - **多光源 UBO**：`LightUBO` 按 `std140` 布局分配 GPU 显存并绑定到 binding point 0；片元着色器 `LightBlock` 中 `Light lights[MAXLIGHTS]` 批量读取，支持方向光 / 点光源（点光源按距离平方衰减）。
 - **Transform.h**：使用四元数存储底层旋转并每次用增量来构建四元数，完美解决了欧拉角导致的**万向锁**问题
+- **Billboard（公告牌）**：光源图标使用一个共用四边形 Mesh，通过 `lookDir`（相机 `-forward`）、`right`、`up` 叉乘构造始终朝向相机的旋转矩阵，实现贴图永远面对相机
+- **硬阴影（Shadow Mapping）**：第一趟用 `shadowShader` 从光源视角把场景深度渲染到 `ShadowMap`（FBO + 深度纹理），主渲染时把片元世界坐标变换到光源空间（`u_LightVP`）采样阴影贴图，`currentDepth > closestDepth` 即判定为阴影
+- **模型加载**：`Model` 递归处理 assimp 节点树，每个子网格生成一个 `GameObject` + `MeshRenderer`；贴图路径拼接模型目录解决相对路径 / 中文路径导致的加载失败
 
 ### 着色器
 
-- **顶点着色器**（`vert.shader`，`#version 330`）：模型 → 世界 → 视图 → 裁剪坐标变换，法线经转置逆矩阵变换，输出世界坐标 / 法线 / UV。
-- **片元着色器**（`frag.shader`，`#version 420`）：Blinn-Phong 光照模型（环境光 + 漫反射 + 高光），支持最多 16 个光源的 UBO 循环计算。
+- **BlinnPhongShaders / vert.shader**（`#version 420`）：模型 → 世界 → 视图 → 裁剪坐标变换，法线经转置逆矩阵变换，输出世界坐标 / 法线 / UV。
+- **BlinnPhongShaders / frag.shader**（`#version 420`）：Blinn-Phong 光照模型（环境光 + 漫反射 + 高光），支持最多 16 个光源的 UBO 循环计算，并集成阴影采样（`CaculateShadow`）。
+- **GizmoShaders**：光源图标（Billboard）着色器，绘制始终面向相机的光源标记四边形。
+- **ShadowShaders / shadow_vert.shader**：阴影深度 Pass 顶点着色器，`gl_Position = u_LightProj * u_LightView * u_Model * vec4(position, 1.0)`，把顶点变换到光源裁剪空间。
+- **ShadowShaders / shadow_frag.shader**：阴影深度 Pass 片元着色器（深度已由硬件自动写入，无需额外输出）。
 
 ---
 
@@ -197,8 +209,8 @@ graph TD
 
 ## 待办 / 扩展方向
 
-- [ ] 阴影映射（Shadow Mapping）
-- [ ] 纹理贴图接入（`Texture` 类已封装，`Main.cpp` 中留有示例）
+- [x] 阴影映射（Shadow Mapping）
+- [x] 纹理贴图接入（`Texture` 类已封装，`Main.cpp` 中留有示例）
 - [ ] 相机自由飞行控制（WASD + 鼠标）
 - [ ] 法线贴图 / 环境贴图（IBL）
 - [ ] PBR 材质完善（`PBRMaterial.h` 已有基类）
