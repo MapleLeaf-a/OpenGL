@@ -9,7 +9,13 @@
                 "if not exist \"${workspaceFolder}\\OpenGL\\build\" mkdir \"${workspaceFolder}\\OpenGL\\build\""
             ],
             "group": "build",
-            "detail": "如果 build 文件夹不存在则创建"
+            "detail": "如果 build 文件夹不存在则创建",
+            "options": {
+                "cwd": "${workspaceFolder}",
+                "shell": {
+                    "executable": "cmd.exe"
+                }
+            }
         },
         {
             "label": "C/C++: cl.exe 生成 OpenGL.exe",

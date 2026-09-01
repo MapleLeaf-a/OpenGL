@@ -56,16 +56,34 @@ float CaculateShadow(vec3 fragPosWorld)
     //仿射变换,转到纹理坐标[0,1]
     projCoords = projCoords * 0.5 + 0.5;
 
-    //采样深度
-    //最近深度
-    float closestDepth = texture2D(u_ShadowMap, projCoords.xy).r;
+    vec2 texelSize = 1.0 / textureSize(u_ShadowMap, 0); //获取纹素大小(mipmap级别为0),用于PCF
+
+    int sampleRadius = 1; //采样半径
+
     //目前深度
     float currentDepth = projCoords.z;
 
-    //若当前深度大于最近深度,则在阴影中
     //添加偏移减轻阴影痤疮
     float bias = 0.005f;
-    float shadow = currentDepth - bias > closestDepth ? 1.0f : 0.0f; 
+    
+    float shadowCount = 0.0f;
+    float totalSamples = 0.0f;
+
+    for (int x = -sampleRadius; x <= sampleRadius; ++x)
+    {
+        for (int y = -sampleRadius; y <= sampleRadius; ++y)
+        {
+            float closestDepth = texture(u_ShadowMap, projCoords.xy + vec2(x, y) * texelSize).r;
+            totalSamples += 1.0f;
+            
+            //在阴影内
+            if (currentDepth - bias > closestDepth) shadowCount += 1.0f;
+        }
+    }
+
+    //PCF:被遮挡采样点占比。除数必须是总采样数(3x3=9)。
+    //之前写成(sampleRadius*2+1)=3,导致shadow值放大3倍,半影区被误判为全黑,阴影边缘被扩大
+    float shadow = shadowCount / totalSamples;
 
     return shadow;
 }
@@ -73,7 +91,7 @@ float CaculateShadow(vec3 fragPosWorld)
 vec4 BlinnPhong(Light light)
 {
     vec3 baseColor = u_Kd;
-    if (u_HasTexture == 1) baseColor = texture2D(u_Texture, v_TexCoord).xyz;
+    if (u_HasTexture == 1) baseColor = texture(u_Texture, v_TexCoord).xyz;
 
 
     vec3 Ld, Ls;

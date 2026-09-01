@@ -84,7 +84,7 @@ public:
     {
         std::unique_ptr<GameObject> camera = std::make_unique<GameObject>(name);
         CameraComponent* cameraComp = camera->AddComponent<CameraComponent>();
-        cameraComp->SetPerspective(45.0f, 16.0f / 9.0f, 0.1f, 100.0f);
+        cameraComp->SetPerspective(45.0f, 16.0f / 9.0f, 0.1f, 1000.0f);
         GameObject* rawPtr = camera.get(); //必须在move前获取原始指针,否则原地址被释放会变成垃圾地址
         m_GameObjects.push_back(std::move(camera));
         return rawPtr;

@@ -79,7 +79,7 @@ private:
     float m_Bottom = -10.0f; float m_Top = 10.0f;
     
     float m_NearPlane = 0.1f;
-    float m_FarPlane = 100.0f;
+    float m_FarPlane = 1000.0f;
 
     //是否是透视投影
     bool m_IsPerspective = true;

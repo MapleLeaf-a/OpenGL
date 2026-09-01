@@ -7,7 +7,7 @@
 class ShadowMap
 {
 public:
-    ShadowMap(int width = 2048, int height = 2048)
+    ShadowMap(int width = 4096, int height = 4096)
     : m_Width(width), m_Height(height)
     {
         //创建FBO(注意:必须用glGenFramebuffers生成帧缓冲对象,不能用glGenBuffers!
@@ -20,7 +20,7 @@ public:
         glBindTexture(GL_TEXTURE_2D, m_DepthTexture);
 
         //分配深度纹理（只存深度，不存颜色）
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, m_Width, m_Height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, m_Width, m_Height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
         /*和Texture.cpp中的参数对比：
         参数	          普通纹理	            深度纹理            	说明
         internalformat	GL_RGBA8	        GL_DEPTH_COMPONENT	GPU 内部存储格式

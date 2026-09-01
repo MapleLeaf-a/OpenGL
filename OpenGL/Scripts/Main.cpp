@@ -89,7 +89,7 @@ int main(void)
     GameObject* cube = scene.CreateCube<BlinnPhongMaterial>("Cube", glm::vec3(0.0f, 0.6f, 0.6f), glm::vec3(1.0f), 200);
     cube->GetTransform().SetPosition(glm::vec3(1.0f, 2.0f, 5.0f));
 
-    GameObject* plane = scene.CreatePlane<BlinnPhongMaterial>("Plane", 10.0f, glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(1.0f), 200);
+    GameObject* plane = scene.CreatePlane<BlinnPhongMaterial>("Plane", 20.0f, glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(1.0f), 200);
     plane->GetTransform().SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 
     GameObject* sphere = scene.CreateSphere<BlinnPhongMaterial>("Sphere", 48, glm::vec3(0.8f, 0.2f, 0.2f), glm::vec3(1.0f), 200);
@@ -103,6 +103,10 @@ int main(void)
     firefly->GetTransform().SetPosition(glm::vec3(2.0f, 2.0f, 0.0f));
     firefly->GetTransform().SetRotation(glm::vec3(-90.0f, 0.0f, 0.0f));
     firefly->GetTransform().SetScale(glm::vec3(0.1f, 0.1f, 0.1f));
+
+    // GameObject* Sponza = scene.LoadModel("../Resources/Models/Sponza/Sponza.obj", "Sponza");
+    // Sponza->GetTransform().SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+    // Sponza->GetTransform().SetScale(glm::vec3(0.1f, 0.1f, 0.1f));
 
     //着色器相关
     std::string vertFilePath = "Shaders/BlinnPhongShaders/vert.shader";
