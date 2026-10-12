@@ -30,6 +30,8 @@
 #include "Scene.h"
 #include "LightUBO.h"
 
+#include "Input.h"
+
 int main(void)
 {
     GLFWwindow* window;
@@ -50,7 +52,7 @@ int main(void)
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
 
-    glfwSwapInterval(0);//设置垂直同步（V-Sync，垂直同步）的函数。它的作用是：控制屏幕刷新率与帧率之间的同步关系。
+    glfwSwapInterval(1);//设置垂直同步（V-Sync，垂直同步）的函数。它的作用是：控制屏幕刷新率与帧率之间的同步关系。
     /*参数值	含义	效果
         0	关闭 V-Sync	帧率不受限制，GPU 全力渲染
         1	开启 V-Sync	帧率与屏幕刷新率同步（如 60Hz 显示器 = 60 FPS）
@@ -66,6 +68,8 @@ int main(void)
     std::cout << glGetString(GL_VERSION) << std::endl;
 
 {
+    Input::Init(window); //初始化输入系统
+
     GLCall(glEnable(GL_BLEND)); //开启 OpenGL 的透明度混合（Alpha Blending）功能，让半透明物体能够正确地与背景融合显示
     GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)); //设置混合方式, 告诉 OpenGL 如何计算混合后的颜色
     /*混合函数                                  	公式	        用途
