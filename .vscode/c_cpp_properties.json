@@ -13,6 +13,7 @@
                 "${workspaceFolder}/OpenGL/Scripts/Render",
                 "${workspaceFolder}/OpenGL/Scripts/Light",
                 "${workspaceFolder}/OpenGL/Scripts/Shadow",
+                "${workspaceFolder}/OpenGL/Scripts/Input",
                 "${workspaceFolder}/OpenGL/Scripts/vendor",
                 "${workspaceFolder}/Dependencies/GLFW/include",
                 "${workspaceFolder}/Dependencies/GLEW/include",
