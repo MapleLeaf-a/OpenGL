@@ -32,6 +32,8 @@
 
 #include "Input.h"
 
+#include "Time/Time.h"
+
 int main(void)
 {
     GLFWwindow* window;
@@ -173,6 +175,12 @@ int main(void)
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {
+        //更新输入状态
+        Input::Update(); 
+
+        //更新时间
+        Time::Update();
+
         glClearColor(0.5f, 0.8f, 0.9f, 1.0f); //设置默认颜色
 
         ///* Render here */
@@ -212,6 +220,33 @@ int main(void)
 
 
         {
+            float camSpeed = 5.0f; //摄像机移动速度
+            if (Input::GetMouseButton(MouseButton::Right))
+            {
+                glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); //按住右键隐藏光标
+                
+                if (Input::GetKey(KeyCode::W))
+                {
+                    camTransform.Translate(camTransform.GetWorldForward() * camSpeed * Time::DeltaTime());
+                }
+                if (Input::GetKey(KeyCode::S))
+                {
+                    camTransform.Translate(-camTransform.GetWorldForward() * camSpeed * Time::DeltaTime());
+                }
+                if (Input::GetKey(KeyCode::A))
+                {
+                    camTransform.Translate(-camTransform.GetWorldRight() * camSpeed * Time::DeltaTime());
+                }
+                if (Input::GetKey(KeyCode::D))
+                {
+                    camTransform.Translate(camTransform.GetWorldRight() * camSpeed * Time::DeltaTime());
+                }
+            }
+            else
+            {
+                glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL); //松开右键显示光标
+            }
+
             ImGui::Begin("Camera Transform");
             
             ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);

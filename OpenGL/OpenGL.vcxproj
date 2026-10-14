@@ -29,26 +29,26 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -108,9 +108,11 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>GLEW_STATIC</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GLEW\include;$(SolutionDir)Dependencies\assimp\include;Scripts\vendor;Scripts;Scripts\Components;Scripts\GameObjects;Scripts\Render;Scripts\Components\Materials;Scripts\Scene;Scripts\Light;Scripts\GameObjects\Model;Scripts\Shadow;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GLEW\include;$(SolutionDir)Dependencies\assimp\include;Scripts\vendor;Scripts;Scripts\Components;Scripts\GameObjects;Scripts\Render;Scripts\Components\Materials;Scripts\Scene;Scripts\Light;Scripts\GameObjects\Model;Scripts\Shadow;Scripts\Input;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+      <BuildStlModules>false</BuildStlModules>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -127,9 +129,11 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>GLEW_STATIC</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GLEW\include;$(SolutionDir)Dependencies\assimp\include;Scripts\vendor;Scripts;Scripts\Components;Scripts\GameObjects;Scripts\Render;Scripts\Components\Materials;Scripts\Scene;Scripts\Light;Scripts\GameObjects\Model;Scripts\Shadow;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GLEW\include;$(SolutionDir)Dependencies\assimp\include;Scripts\vendor;Scripts;Scripts\Components;Scripts\GameObjects;Scripts\Render;Scripts\Components\Materials;Scripts\Scene;Scripts\Light;Scripts\GameObjects\Model;Scripts\Shadow;Scripts\Input;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+      <BuildStlModules>false</BuildStlModules>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -143,12 +147,12 @@
     <ClCompile Include="Scripts\Components\Mesh.cpp" />
     <ClCompile Include="Scripts\GameObjects\Model\Model.cpp" />
     <ClCompile Include="Scripts\IndexBuffer.cpp" />
+    <ClCompile Include="Scripts\Input\Input.cpp" />
     <ClCompile Include="Scripts\Main.cpp" />
     <ClCompile Include="Scripts\Render\Renderer.cpp" />
     <ClCompile Include="Scripts\Shader.cpp" />
     <ClCompile Include="Scripts\Texture.cpp" />
-    <ClCompile Include="Scripts\vendor\glm\detail\glm.cpp" />
-    <ClCompile Include="Scripts\vendor\glm\glm.cppm" />
+    <ClCompile Include="Scripts\Time\Time.cpp" />
     <ClCompile Include="Scripts\vendor\imgui\imgui.cpp" />
     <ClCompile Include="Scripts\vendor\imgui\imgui_demo.cpp" />
     <ClCompile Include="Scripts\vendor\imgui\imgui_draw.cpp" />
@@ -174,6 +178,8 @@
     <ClInclude Include="Scripts\GameObjects\GameObjectFactory.h" />
     <ClInclude Include="Scripts\GameObjects\Model\Model.h" />
     <ClInclude Include="Scripts\IndexBuffer.h" />
+    <ClInclude Include="Scripts\Input\Input.h" />
+    <ClInclude Include="Scripts\Input\KeyCode.h" />
     <ClInclude Include="Scripts\Light\LightData.h" />
     <ClInclude Include="Scripts\Light\LightUBO.h" />
     <ClInclude Include="Scripts\Renderer.h" />
@@ -184,6 +190,7 @@
     <ClInclude Include="Scripts\Tests\Test.h" />
     <ClInclude Include="Scripts\Tests\TestClearColor.h" />
     <ClInclude Include="Scripts\Texture.h" />
+    <ClInclude Include="Scripts\Time\Time.h" />
     <ClInclude Include="Scripts\vendor\glm\common.hpp" />
     <ClInclude Include="Scripts\vendor\glm\detail\compute_common.hpp" />
     <ClInclude Include="Scripts\vendor\glm\detail\compute_vector_decl.hpp" />

@@ -75,6 +75,12 @@
     <ClCompile Include="Scripts\Render\Renderer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Scripts\Input\Input.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripts\Time\Time.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Scripts\Tests\Test.h">
@@ -1056,6 +1062,15 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Scripts\Shadow\ShadowMap.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripts\Input\Input.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripts\Input\KeyCode.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripts\Time\Time.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
