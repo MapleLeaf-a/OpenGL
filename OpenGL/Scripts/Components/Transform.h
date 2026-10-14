@@ -154,6 +154,12 @@ public:
 		return translation * rotation * scale;
 	}
 
+	void Translate(const glm::vec3& translation)
+	{
+		m_LocalPosition += translation;
+		m_Dirty = true;
+	}
+
 private:
 	void UpdateModelMatrix() 
 	{

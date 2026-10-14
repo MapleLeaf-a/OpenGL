@@ -72,6 +72,7 @@
                 "${workspaceFolder}\\OpenGL\\Scripts\\Components\\Mesh.cpp",
                 "${workspaceFolder}\\OpenGL\\Scripts\\GameObjects\\Model\\Model.cpp",
                 "${workspaceFolder}\\OpenGL\\Scripts\\Input\\Input.cpp",
+                "${workspaceFolder}\\OpenGL\\Scripts\\Time\\Time.cpp",
                 "${workspaceFolder}\\OpenGL\\Scripts\\vendor\\imgui\\imgui.cpp",
                 "${workspaceFolder}\\OpenGL\\Scripts\\vendor\\imgui\\imgui_demo.cpp",
                 "${workspaceFolder}\\OpenGL\\Scripts\\vendor\\imgui\\imgui_draw.cpp",
