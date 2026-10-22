@@ -28,6 +28,14 @@ void Input::Update()
     {
         m_MouseCurr[i] = glfwGetMouseButton(m_window, i) == GLFW_PRESS;
     }
+
+    //更新鼠标
+    m_MousePrevPos = m_MousePos;
+    double xpos, ypos;
+    glfwGetCursorPos(m_window, &xpos, &ypos);
+    m_MousePos = glm::vec2(static_cast<float>(xpos), static_cast<float>(ypos));
+
+
 }
 
 bool Input::GetKey(KeyCode key)
@@ -62,4 +70,14 @@ bool Input::GetMouseButtonUp(MouseButton button)
 {
     int i = static_cast<int>(button);
     return !m_MouseCurr[i] && m_MousePrev[i];
+}
+
+glm::vec2 Input::GetMousePosition()
+{
+    return m_MousePos;
+}
+
+glm::vec2 Input::GetMouseDelta()
+{
+    return m_MousePos - m_MousePrevPos;
 }
