@@ -34,6 +34,11 @@
 
 #include "Time/Time.h"
 
+static const float EPS = 1.0f;
+
+static const int WINDOW_WIDTH = 1920 / 2;
+static const int WINDOW_HEIGHT = 1080 / 2;
+
 int main(void)
 {
     GLFWwindow* window;
@@ -44,7 +49,7 @@ int main(void)
 
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(1920, 1080, "Hello World", NULL, NULL);
+    window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Hello World", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
@@ -240,6 +245,20 @@ int main(void)
                 if (Input::GetKey(KeyCode::D))
                 {
                     camTransform.Translate(camTransform.GetWorldRight() * camSpeed * Time::DeltaTime());
+                }
+
+                glm::vec2 delta = Input::GetMouseDelta();
+                float mouseSensitivity = 0.01f; //鼠标灵敏度
+
+                //水平时绕世界y旋转
+                if (std::abs(delta.x) > EPS)
+                {
+                    camTransform.Rotate(glm::vec3(0, 1, 0) * -delta.x * mouseSensitivity);
+                }
+                //垂直时绕本地right旋转
+                if (std::abs(delta.y) > EPS)
+                {
+                    camTransform.Rotate(camTransform.GetWorldRight() * -delta.y * mouseSensitivity);
                 }
             }
             else
