@@ -1,10 +1,12 @@
 #include "Input.h"
 
-GLFWwindow* Input::m_window = nullptr; //静态成员在类外初始化
+GLFWwindow* Input::m_window = nullptr; //静态成员必须在类外初始化(类内只是声明)
 std::array<bool, GLFW_KEY_LAST + 1> Input::m_KeysCurr = { false };
 std::array<bool, GLFW_KEY_LAST + 1> Input::m_KeysPrev = { false };
 std::array<bool, GLFW_MOUSE_BUTTON_LAST + 1> Input::m_MouseCurr = { false };
 std::array<bool, GLFW_MOUSE_BUTTON_LAST + 1> Input::m_MousePrev = { false };
+glm::vec2 Input::m_MousePos = glm::vec2(0.0f);
+glm::vec2 Input::m_MousePrevPos = glm::vec2(0.0f);
 
 void Input::Init(GLFWwindow* window)
 {
