@@ -36,8 +36,8 @@
 
 static const float EPS = 1.0f;
 
-static const int WINDOW_WIDTH = 1920 / 2;
-static const int WINDOW_HEIGHT = 1080 / 2;
+static const int WINDOW_WIDTH = 1920;
+static const int WINDOW_HEIGHT = 1080;
 
 int main(void)
 {
@@ -115,9 +115,9 @@ int main(void)
     firefly->GetTransform().SetRotation(glm::vec3(-90.0f, 0.0f, 0.0f));
     firefly->GetTransform().SetScale(glm::vec3(0.1f, 0.1f, 0.1f));
 
-    // GameObject* Sponza = scene.LoadModel("../Resources/Models/Sponza/Sponza.obj", "Sponza");
-    // Sponza->GetTransform().SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
-    // Sponza->GetTransform().SetScale(glm::vec3(0.1f, 0.1f, 0.1f));
+    GameObject* Sponza = scene.LoadModel("../Resources/Models/Sponza/Sponza.obj", "Sponza");
+    Sponza->GetTransform().SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+    Sponza->GetTransform().SetScale(glm::vec3(0.1f, 0.1f, 0.1f));
 
     //着色器相关
     std::string vertFilePath = "Shaders/BlinnPhongShaders/vert.shader";
@@ -176,6 +176,7 @@ int main(void)
     float y = lastY;
     float z = lastZ;
     
+    float camSpeed = 5.0f; //摄像机移动速度
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
@@ -225,7 +226,6 @@ int main(void)
 
 
         {
-            float camSpeed = 5.0f; //摄像机移动速度
             if (Input::GetMouseButton(MouseButton::Right))
             {
                 glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); //按住右键隐藏光标
@@ -260,10 +260,15 @@ int main(void)
                 {
                     camTransform.Rotate(camTransform.GetWorldRight() * -delta.y * mouseSensitivity);
                 }
+                if (Input::GetKeyDown(KeyCode::Shift))
+                {
+                    camSpeed *= 2;
+                }
             }
             else
             {
                 glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL); //松开右键显示光标
+                camSpeed = 5.0f;
             }
 
             ImGui::Begin("Camera Transform");

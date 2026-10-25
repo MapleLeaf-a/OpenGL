@@ -30,6 +30,7 @@ enum class KeyCode : int //cpp11写法，强类型枚举，限定了枚举的作
     Z = GLFW_KEY_Z,
     Escape = GLFW_KEY_ESCAPE,
     Space = GLFW_KEY_SPACE,
+    Shift = GLFW_KEY_LEFT_SHIFT,
 };
 
 enum class MouseButton : int
