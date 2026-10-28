@@ -211,7 +211,7 @@ graph TD
 
 - [x] 阴影映射（Shadow Mapping）
 - [x] 纹理贴图接入（`Texture` 类已封装，`Main.cpp` 中留有示例）
-- [ ] 相机自由飞行控制（WASD + 鼠标）
+- [x] 相机自由飞行控制（WASD + 鼠标）
 - [ ] 法线贴图 / 环境贴图（IBL）
 - [ ] PBR 材质完善（`PBRMaterial.h` 已有基类）
 

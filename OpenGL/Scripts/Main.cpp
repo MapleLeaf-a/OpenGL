@@ -224,8 +224,13 @@ int main(void)
 
         renderer.RenderLightGizmos(scene, cameraComp, gizmoShader, &pointLightIcon, &dirLightIcon);
 
+        // scene.DestroyGameObject(Sponza); 
 
         {
+            // 例如按下 F 键销毁 Sponza，同时用 ImGui 打印 scene.GetMeshRenderers().size()
+if (Input::GetKeyDown(KeyCode::F)) scene.DestroyGameObject(Sponza);
+ImGui::Text("MeshRenderers: %d", (int)scene.GetMeshRenderers().size());
+
             if (Input::GetMouseButton(MouseButton::Right))
             {
                 glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); //按住右键隐藏光标

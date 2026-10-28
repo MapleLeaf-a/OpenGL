@@ -26,15 +26,16 @@ public:
         return rawPtr;
     }
 
-    //通过指针销毁游戏物体
+    //通过指针销毁游戏物体，改为延迟销毁，在帧末统一回收
     void DestroyGameObject(GameObject* gameObject)
     {
-        auto it = std::find_if(m_GameObjects.begin(), m_GameObjects.end(),
-            [gameObject](const std::unique_ptr<GameObject>& obj) { return obj.get() == gameObject; });
+        if (!gameObject) return;
 
-        if (it != m_GameObjects.end())
+        auto it = std::find(m_PendingDestroy.begin(), m_PendingDestroy.end(), gameObject);
+
+        if (it == m_PendingDestroy.end())
         {
-            m_GameObjects.erase(it);
+            m_PendingDestroy.push_back(gameObject);
         }
     }
 
@@ -58,6 +59,9 @@ public:
         {
             obj->Update(deltaTime);
         }
+
+        //处理销毁队列
+        ProcessPendingDestroy();
     }
 
     // //每帧渲染所有物体
@@ -188,4 +192,38 @@ private:
 
     //光源组件的集合
     std::vector<LightComponent*> m_Lights;
+
+    //销毁队列
+    std::vector<GameObject*> m_PendingDestroy;
+
+    //帧末处理销毁队列
+    void ProcessPendingDestroy()
+    {
+        if (m_PendingDestroy.empty()) return;
+        for (GameObject* gameObject : m_PendingDestroy)
+        {
+            DestroyGameObjectImmediate(gameObject);
+        }
+        m_PendingDestroy.clear();
+
+        //暂时先做暴力重建
+        m_MeshRenderers.clear();
+        m_Lights.clear();
+
+        for (const std::unique_ptr<GameObject>& obj : m_GameObjects)
+        {
+            if (MeshRenderer* mr = obj->GetComponent<MeshRenderer>())
+                m_MeshRenderers.push_back(mr);
+            if (LightComponent* lc = obj->GetComponent<LightComponent>())
+                m_Lights.push_back(lc);
+        }
+    }
+
+    //立即销毁游戏物体(包括父子层级)
+    void DestroyGameObjectImmediate(GameObject* gameObject)
+    {
+        if (!gameObject) return;
+        
+        
+    }
 };
