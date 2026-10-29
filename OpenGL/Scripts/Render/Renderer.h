@@ -19,7 +19,15 @@ class Mesh;
 class GameObject;
 
 //调用GLCall以更好地调试opengl代码
-#define ASSERT(x) if (!(x)) __debugbreak() //断言(Assertion),如果x为假（false/0）,  __debugbreak()编译器内置函数(MSVC特有),触发断点
+#if defined(_MSC_VER)
+    #define DEBUG_BREAK() __debugbreak()         //MSVC 编译器内置
+#elif defined(__GNUC__) || defined(__clang__)
+    #define DEBUG_BREAK() __builtin_trap()        //GCC / Clang
+#else
+    #include <cstdlib>
+    #define DEBUG_BREAK() std::abort()
+#endif
+#define ASSERT(x) if (!(x)) DEBUG_BREAK() //断言(Assertion),如果x为假（false/0）,触发中断
 #define GLCall(x) GLClearError();\
     x;\
     ASSERT(GLPrintError(#x, __FILE__, __LINE__))

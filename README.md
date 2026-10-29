@@ -47,7 +47,8 @@
 
 - **语言 / 标准**：C++20
 - **图形 API**：OpenGL 4.2 Core（顶点着色器 `#version 330`，片元着色器 `#version 420`）
-- **编译器**：MSVC（Visual Studio 2022，`cl.exe`）
+- **构建系统**：CMake（三平台通用）或 Visual Studio `.sln`
+- **编译器**：MSVC（Windows）/ GCC / Clang（Linux / macOS）
 
 ---
 
@@ -55,13 +56,14 @@
 
 ```
 OpenGL(Manually)/
-├── OpenGL.sln                      # 根级解决方案
-├── Dependencies/                   # 第三方库（GLFW / GLEW / assimp 的头文件与静态库）
+├── CMakeLists.txt                 # CMake 构建脚本（三平台通用）
+├── OpenGL.sln                     # VS 解决方案（Windows 直接打开用）
+├── Dependencies/                  # 第三方库（GLFW / GLEW / assimp 的头文件与 Windows 预编译 .lib）
 ├── OpenGL/
 │   ├── OpenGL.sln / OpenGL.vcxproj # VS 工程文件
-│   ├── build/                      # 手动构建输出（OpenGL.exe）
+│   ├── build/                      # VS 构建输出
 │   ├── Resources/
-│   │   ├── Models/                 # 模型资源（Firefly / Kazuha）
+│   │   ├── Models/                 # 模型资源（Firefly / Kazuha 等）
 │   │   └── Textures/               # 纹理资源
 │   └── Scripts/
 │       ├── Main.cpp                # 程序入口：窗口、场景搭建、主循环
@@ -95,26 +97,71 @@ OpenGL(Manually)/
 │       │   ├── GizmoShaders/       # 光源图标（Billboard）着色器
 │       │   └── ShadowShaders/      # 阴影深度 Pass 着色器
 │       └── vendor/                 # 第三方源码（glm / imgui / stb_image）
-└── build/                          # 根级构建输出目录
+└── build/                          # CMake 构建输出目录（本地生成，不入版本控制）
 ```
 
 ---
 
 ## 环境要求
 
-- Windows（本仓库基于 Windows + MSVC 配置）
-- [Visual Studio 2022](https://visualstudio.microsoft.com/)（含 **C++ 桌面开发**工作负载，提供 `cl.exe`）
 - 支持 OpenGL 4.2 的显卡驱动
+- CMake ≥ 3.20（推荐；也可直接用 Visual Studio 打开 `.sln`）
+- 平台与编译器：
+  - **Windows**：Visual Studio 2022（含 **C++ 桌面开发** 工作负载，提供 `cl.exe`）
+  - **Linux**：GCC ≥ 11 或 Clang ≥ 13，并通过包管理器安装 glfw / glew / assimp 开发包
 
 ---
 
 ## 构建
 
-### 方式一：VS Code（推荐，`Ctrl+Shift+B`）
+推荐使用 **CMake**，一次性 CMakeLists 可在 Windows / Linux / macOS 上通用；Windows 下也可以用 Visual Studio 直接打开 `.sln` 或在 VS Code 里按 `Ctrl+Shift+B` 跑任务。
+
+### 方式一：CMake（推荐，三平台通用）
+
+#### Windows
+
+```powershell
+# 项目根目录 D:\OpenGL
+cmake -S . -B build                       # ① 配置：生成 build\OpenGL.sln
+cmake --build build --config Release      # ② 编译 Release
+.\build\Release\OpenGL.exe                # ③ 运行（从任意目录都行）
+```
+
+- Debug：把 `--config Release` 换成 `--config Debug`，产物在 `build\Debug\`。
+- 并行编译：`cmake --build build --config Release -j 8`。
+- CMake 不在 PATH 里的话：`winget install Kitware.CMake` 或 `choco install cmake -y --installargs 'ADD_CMAKE_TO_PATH=System'`。
+
+#### Linux
+
+```bash
+# Debian / Ubuntu：装依赖
+sudo apt install -y build-essential cmake libglfw3-dev libglew-dev libassimp-dev
+
+mkdir build && cd build
+cmake ..
+make -j$(nproc)
+./OpenGL
+```
+
+> **WSL 2 下的常见问题**（真实 Linux 一般不会遇到）：
+> - **GLEW + Wayland 不兼容**：WSLg 默认同时暴露 Wayland 和 X11；GLFW 会优先选 Wayland+EGL，而 GLEW 只支持 GLX，于是 `glewInit()` 返回 `GLEW_ERROR_NO_GLX_DISPLAY`。本项目在 Main.cpp 里已通过 `glfwInitHint(GLFW_PLATFORM, GLFW_PLATFORM_X11)` 显式走 X11，需要 GLFW ≥ 3.4（Ubuntu 24.04 及以上默认满足）。
+
+> **CMakeLists 的几个特性，减少后续维护负担**
+> - 自动递归扫描 `OpenGL/Scripts/` 下所有 `.cpp` / `.h` / `.hpp`，**新增文件/文件夹无需修改 CMakeLists**；配合 `CONFIGURE_DEPENDS`，CMake 会在下次 build 时自动重扫文件树
+> - **启动时自动 `chdir`**：生成一个 bootstrap 源文件在静态初始化期切 CWD 到 `OpenGL/Scripts/`，使 `../Resources/...` 这类相对路径生效；因此可从任意目录运行可执行文件
+> - 平台适配：Windows 使用仓库内自带的预编译 `.lib`（MSVC `lib-vc2022`）；Linux / macOS 走 `find_package` 使用系统包管理器安装的库
+
+### 方式二：Visual Studio（Windows）
+
+1. 打开根目录 `OpenGL.sln`（或 `OpenGL/OpenGL.sln`）；
+2. 选择 `x64` 平台，构建并运行。
+3. 注意必须要使用 **Release** 而不是 Debug 进行编译（如图）![](./ReadmeImages/Release.png)
+
+### 方式三：VS Code 一键构建（Windows，`Ctrl+Shift+B`）
 
 项目在 `.vscode/tasks.json` 中配置了 MSVC 手动构建任务：
 
-1. 打开工作区 `OpenGL`；(注意**一定**要进入OpenGL这个文件夹，保证工作区在正确的位置否则会编译失败)
+1. 打开工作区 `OpenGL`；（注意**一定**要进入 OpenGL 这个文件夹，保证工作区在正确的位置否则会编译失败）
 2. 按 `Ctrl+Shift+B` 执行 **`C/C++: cl.exe 生成 OpenGL.exe`** 任务；
 3. 任务通过 `cmd.exe /c` 先调用 `vcvarsall.bat x64` 再执行 `cl.exe`，不依赖终端持久环境；
 4. 输出：`OpenGL/build/OpenGL.exe`。
@@ -122,12 +169,6 @@ OpenGL(Manually)/
 > 注意：
 > - **VS 安装路径自动探测**：任务不再硬编码 `vcvarsall.bat` 的绝对路径，而是通过 `vswhere`（`%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe`）定位本机最新安装且带有 C++ 工具的 VS，再调用其 `vcvarsall.bat`。因此**换机器 / 换 VS 版本 / 换安装盘符都不需要改 `tasks.json`**，只要机器装有 VS 的 C++ 桌面开发工作负载即可。
 > - 修改 `tasks.json` 后需 **重载窗口**（`Ctrl+Shift+P` → Reload Window），否则会复用已损坏的任务终端。
-
-### 方式二：Visual Studio
-
-1. 打开根目录 `OpenGL.sln`（或 `OpenGL/OpenGL.sln`）；
-2. 选择 `x64` 平台，构建并运行。
-3. 注意必须要使用**Release**而不是Debug进行编译(如图)![](./ReadmeImages/Release.png)
 
 ---
 

@@ -10,7 +10,7 @@ layout(location = 0) out vec4 color;
 
 void main()
 {
-    vec4 texColor = texture2D(u_IconTexture, v_TexCoord);
+    vec4 texColor = texture(u_IconTexture, v_TexCoord); //GLSL 1.30+ 已废弃 texture2D，统一用重载的 texture()
 
     color = texColor;
 }

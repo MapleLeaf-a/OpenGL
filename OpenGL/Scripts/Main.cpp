@@ -36,12 +36,19 @@
 
 static const float EPS = 1.0f;
 
-static const int WINDOW_WIDTH = 1920;
-static const int WINDOW_HEIGHT = 1080;
+static const int WINDOW_WIDTH = 1920 / 2;
+static const int WINDOW_HEIGHT = 1080 / 2;
 
 int main(void)
 {
     GLFWwindow* window;
+
+    // Linux 下 GLFW 默认优先 Wayland(EGL)，但 GLEW 只支持 GLX，两者凑在一起 glewInit 会失败。
+    // 显式告诉 GLFW 用 X11（会走 XWayland 中转，功能完整）。GLFW < 3.4 没有 GLFW_PLATFORM，
+    // 用 #ifdef 保护一下，兼容老版本。
+#if defined(__linux__) && defined(GLFW_PLATFORM) && defined(GLFW_PLATFORM_X11)
+    glfwInitHint(GLFW_PLATFORM, GLFW_PLATFORM_X11);
+#endif
 
     /* Initialize the library */
     if (!glfwInit())
@@ -67,10 +74,16 @@ int main(void)
 
 
     //移动到已创建OpenGL上下文处
-    if (glewInit() != GLEW_OK)
+    // GLEW 在 Linux / Mesa 的 core profile 下常常拿不到 glGetStringi 等入口，
+    // 必须开启 experimental 模式才能用。Windows + NVIDIA 下即使不开也能工作，
+    // 为跨平台起见统一打开。
+    glewExperimental = GL_TRUE;
+    if (GLenum err = glewInit(); err != GLEW_OK)
     {
+        std::cerr << "glewInit failed: " << glewGetErrorString(err) << std::endl;
         return -2;
     }
+    glGetError(); // GLEW 开启 experimental 后，首次调用常常会残留一个 GL_INVALID_ENUM，这里吞掉
 
     std::cout << glGetString(GL_VERSION) << std::endl;
 
@@ -115,9 +128,9 @@ int main(void)
     firefly->GetTransform().SetRotation(glm::vec3(-90.0f, 0.0f, 0.0f));
     firefly->GetTransform().SetScale(glm::vec3(0.1f, 0.1f, 0.1f));
 
-    GameObject* Sponza = scene.LoadModel("../Resources/Models/Sponza/Sponza.obj", "Sponza");
-    Sponza->GetTransform().SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
-    Sponza->GetTransform().SetScale(glm::vec3(0.1f, 0.1f, 0.1f));
+    // GameObject* Sponza = scene.LoadModel("../Resources/Models/Sponza/Sponza.obj", "Sponza");
+    // Sponza->GetTransform().SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+    // Sponza->GetTransform().SetScale(glm::vec3(0.1f, 0.1f, 0.1f));
 
     //着色器相关
     std::string vertFilePath = "Shaders/BlinnPhongShaders/vert.shader";
@@ -228,8 +241,8 @@ int main(void)
 
         {
             // 例如按下 F 键销毁 Sponza，同时用 ImGui 打印 scene.GetMeshRenderers().size()
-if (Input::GetKeyDown(KeyCode::F)) scene.DestroyGameObject(Sponza);
-ImGui::Text("MeshRenderers: %d", (int)scene.GetMeshRenderers().size());
+// if (Input::GetKeyDown(KeyCode::F)) scene.DestroyGameObject(Sponza);
+// ImGui::Text("MeshRenderers: %d", (int)scene.GetMeshRenderers().size());
 
             if (Input::GetMouseButton(MouseButton::Right))
             {

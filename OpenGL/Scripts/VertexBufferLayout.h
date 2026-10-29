@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <type_traits>
 #include "Renderer.h"
 
 //对应glVertexAttribPointer中的部分参数
@@ -31,6 +32,11 @@ private:
 public:
 	VertexBufferLayout() : m_Stride(0) {}
 
+	// 用 if constexpr 分派到具体类型。
+	// 类内显式全特化（template<> void Push<float>）是 MSVC 扩展，
+	// 标准 C++ 要求全特化必须在命名空间作用域，GCC/Clang 下会报错，
+	// 所以这里改成单一模板 + if constexpr，多平台通用。
+	//if constexpr 是 C++17 新特性，编译器在编译期就能判断条件是否成立，若不成立则不会实例化 if 语句块内的代码。
 	template<typename T>
 	void Push(unsigned int count)
 	{
@@ -38,22 +44,25 @@ public:
 	}
 
 	//全特化模板（Explicit / Full Specialization），是指为模板的某一组特定类型，提供一个完全独立的实现版本
-	template<>
-	void Push<float>(unsigned int count)
+	template<typename T>
+		requires std::is_same_v<T, float>
+	void Push(unsigned int count)
 	{
 		m_Elements.push_back({ GL_FLOAT, count, GL_FALSE });
 		m_Stride += VertexBufferElement::GetSizeofType(GL_FLOAT) * count;
 	}
 
-	template<>
-	void Push<unsigned int>(unsigned int count)
+	template<typename T>
+		requires std::is_same_v<T, unsigned int>
+	void Push(unsigned int count)
 	{
 		m_Elements.push_back({ GL_UNSIGNED_INT, count, GL_FALSE });
 		m_Stride += VertexBufferElement::GetSizeofType(GL_UNSIGNED_INT) * count;
 	}
 
-	template<>
-	void Push<unsigned char>(unsigned int count)
+	template<typename T>
+		requires std::is_same_v<T, unsigned char>
+	void Push(unsigned int count)
 	{
 		m_Elements.push_back({ GL_UNSIGNED_BYTE, count, GL_TRUE });
 		m_Stride += VertexBufferElement::GetSizeofType(GL_UNSIGNED_BYTE) * count;

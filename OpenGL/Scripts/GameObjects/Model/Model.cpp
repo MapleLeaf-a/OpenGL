@@ -2,6 +2,7 @@
 #include "BlinnPhongMaterial.h"
 
 #include <iostream>
+#include <algorithm>
 
 class Texture; //前向声明,因为Material中include过Texture
 
@@ -152,6 +153,10 @@ std::shared_ptr<Material> Model::ProcessMaterial(aiMaterial* aiMat, const aiScen
     if (aiMat->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath) == AI_SUCCESS) //获取漫反射贴图的第0套贴图(一般0是主贴图)
     {
         std::string path = texturePath.C_Str();  //这个是相对模型路径
+
+        //FBX 等模型文件在 Windows 下导出时路径分隔符是 '\'，Linux 下 '\' 是普通字符
+        //会导致 fopen 失败。统一转成 '/'，Windows 也兼容
+        std::replace(path.begin(), path.end(), '\\', '/');
 
         path = m_ModelDirectory + path; //一定要拼接出完整路径！否则stb Load会加载失败
 

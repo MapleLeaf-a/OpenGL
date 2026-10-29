@@ -4,6 +4,7 @@
 #include <vector>
 #include <concepts>
 #include <memory>
+#include <algorithm>
 
 #include "Transform.h"
 #include "Component.h"

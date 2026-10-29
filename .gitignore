@@ -7,6 +7,9 @@
 *.o
 *.obj
 
+# —— 例外：Resources 下的 3D 模型 .obj 文件要随仓库提交 ——
+!OpenGL/Resources/**/*.obj
+
 # Precompiled Headers
 *.gch
 *.pch
