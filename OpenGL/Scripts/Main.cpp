@@ -128,9 +128,9 @@ int main(void)
     firefly->GetTransform().SetRotation(glm::vec3(-90.0f, 0.0f, 0.0f));
     firefly->GetTransform().SetScale(glm::vec3(0.1f, 0.1f, 0.1f));
 
-    // GameObject* Sponza = scene.LoadModel("../Resources/Models/Sponza/Sponza.obj", "Sponza");
-    // Sponza->GetTransform().SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
-    // Sponza->GetTransform().SetScale(glm::vec3(0.1f, 0.1f, 0.1f));
+    GameObject* Sponza = scene.LoadModel("../Resources/Models/Sponza/Sponza.obj", "Sponza");
+    Sponza->GetTransform().SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+    Sponza->GetTransform().SetScale(glm::vec3(0.1f, 0.1f, 0.1f));
 
     //着色器相关
     std::string vertFilePath = "Shaders/BlinnPhongShaders/vert.shader";
@@ -241,8 +241,8 @@ int main(void)
 
         {
             // 例如按下 F 键销毁 Sponza，同时用 ImGui 打印 scene.GetMeshRenderers().size()
-// if (Input::GetKeyDown(KeyCode::F)) scene.DestroyGameObject(Sponza);
-// ImGui::Text("MeshRenderers: %d", (int)scene.GetMeshRenderers().size());
+if (Input::GetKeyDown(KeyCode::F)) scene.DestroyGameObject(Sponza);
+ImGui::Text("MeshRenderers: %d", (int)scene.GetMeshRenderers().size());
 
             if (Input::GetMouseButton(MouseButton::Right))
             {
