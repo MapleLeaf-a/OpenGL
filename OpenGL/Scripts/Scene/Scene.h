@@ -32,7 +32,7 @@ public:
         if (!gameObject) return;
 
         auto it = std::find(m_PendingDestroy.begin(), m_PendingDestroy.end(), gameObject);
-
+        //若物体不在销毁队列中，则加入销毁队列
         if (it == m_PendingDestroy.end())
         {
             m_PendingDestroy.push_back(gameObject);
@@ -224,6 +224,19 @@ private:
     {
         if (!gameObject) return;
         
+        //若子物体先于父入队,此时对父物体来说子物体可能已在之前的递归中被释放
+        auto it = std::find_if(m_GameObjects.begin(), m_GameObjects.end(),
+            [gameObject](const std::unique_ptr<GameObject>& obj) { return obj.get() == gameObject; });  
+        if (it == m_GameObjects.end()) return;
         
+        //递归销毁子物体
+        std::vector<GameObject*> children = gameObject->GetChildren();
+        for (GameObject* child : children)
+        {
+            DestroyGameObjectImmediate(child);
+        }
+
+        gameObject->SetParent(nullptr); //解除父子关系,避免父物体被销毁时对子物体的访问
+        m_GameObjects.erase(it); //从场景中移除,unique_ptr引用计数归0会自动释放内存
     }
 };
