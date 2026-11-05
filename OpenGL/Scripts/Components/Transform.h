@@ -121,7 +121,7 @@ public:
 	//获取世界坐标系下的Model矩阵
 	const glm::mat4& GetModelMatrix() 
 	{
-        if (m_Dirty) 
+        if (IsDirtyRecursive()) //如果自己或者任何父物体有变换,就需要更新世界矩阵 
 		{
             UpdateModelMatrix();
         }
@@ -160,6 +160,18 @@ public:
 		m_Dirty = true;
 	}
 
+	//让Transform朝向目标位置
+	void LookAt(const Transform& worldTarget, const glm::vec3& worldUp = glm::vec3(0, 1, 0))
+	{
+        glm::vec3 lookDir = glm::normalize(worldTarget.GetPosition() - this->GetPosition());
+        glm::vec3 right = glm::normalize(glm::cross(lookDir, glm::vec3(0, 1, 0))); //通过叉乘lookDir和世界坐标的Up(0,1,0)得到right
+        glm::vec3 up = glm::normalize(glm::cross(right, lookDir));
+
+       	glm::mat3 basis(right, up, -lookDir); //列主序的旋转矩阵:X=right,Y=up,Z=-lookDir(因为本地forward是-Z)
+		SetRotation(glm::quat_cast(basis));
+		m_Dirty = true;
+	}
+
 private:
 	void UpdateModelMatrix() 
 	{
@@ -177,13 +189,22 @@ private:
         m_Dirty = false;
     }
 
+	//递归地去检查父物体是否dirty
+	bool IsDirtyRecursive() const
+	{
+		if (m_Dirty) return true;
+		return m_Parent && m_Parent->IsDirtyRecursive();
+	}
+
 	glm::mat4 m_WorldMatrix; //世界矩阵
 	//本地坐标系(未考虑父物体)
 	glm::quat m_LocalRotation;   //四元数存储旋转,计算量更小且避免万向锁
 	glm::vec3 m_LocalPosition;  
 	glm::vec3 m_LocalScale;
 
-	Transform* m_Parent;
+	Transform* m_Parent = nullptr; //父物体指针
+	std::vector<Transform*> m_Children; //子物体指针列表
+	GameObject* m_Owner; //拥有这个Transform的GO
 	
 	bool m_Dirty;
 };

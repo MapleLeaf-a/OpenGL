@@ -36,8 +36,8 @@
 
 static const float EPS = 1.0f;
 
-static const int WINDOW_WIDTH = 1920;
-static const int WINDOW_HEIGHT = 1080;
+static const int WINDOW_WIDTH = 1920 / 2;
+static const int WINDOW_HEIGHT = 1080 / 2;
 
 int main(void)
 {
@@ -202,6 +202,9 @@ int main(void)
 
         //更新场景
         scene.OnUpdate(Time::DeltaTime());
+
+        kazuha->GetTransform().LookAt(camTransform);
+        cube->GetTransform().LookAt(camTransform);
 
         glClearColor(0.5f, 0.8f, 0.9f, 1.0f); //设置默认颜色
 

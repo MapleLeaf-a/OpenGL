@@ -111,9 +111,9 @@ public:
     const std::string& GetName() const { return m_Name; }
 
 private:
-    GameObject* m_Parent = nullptr; //父物体指针
+    // GameObject* m_Parent = nullptr; //父物体指针
     Transform m_Transform; //每个GO都应该有一个transform
     std::string m_Name;
-    std::vector<GameObject*> m_Children; //子物体指针
+    // std::vector<GameObject*> m_Children; //子物体指针
     std::vector<std::unique_ptr<Component>> m_Components; //组件和GO同生命周期
 };
