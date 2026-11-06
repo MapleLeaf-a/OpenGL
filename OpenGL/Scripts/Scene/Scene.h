@@ -202,7 +202,7 @@ private:
         if (m_PendingDestroy.empty()) return;
         for (GameObject* gameObject : m_PendingDestroy)
         {
-            DestroyGameObjectImmediate(gameObject);
+            DestroyGameObjectImmediate(&gameObject->GetTransform());
         }
         m_PendingDestroy.clear();
 
@@ -220,18 +220,20 @@ private:
     }
 
     //立即销毁游戏物体(包括父子层级)
-    void DestroyGameObjectImmediate(GameObject* gameObject)
+    void DestroyGameObjectImmediate(Transform* gameObjectTransform)
     {
-        if (!gameObject) return;
+        if (!gameObjectTransform) return;
         
+        GameObject* gameObject = gameObjectTransform->GetOwner();
+
         //若子物体先于父入队,此时对父物体来说子物体可能已在之前的递归中被释放
         auto it = std::find_if(m_GameObjects.begin(), m_GameObjects.end(),
             [gameObject](const std::unique_ptr<GameObject>& obj) { return obj.get() == gameObject; });  
         if (it == m_GameObjects.end()) return;
         
         //递归销毁子物体
-        std::vector<GameObject*> children = gameObject->GetChildren();
-        for (GameObject* child : children)
+        std::vector<Transform*> children = gameObjectTransform->GetChildren();
+        for (Transform* child : children)
         {
             DestroyGameObjectImmediate(child);
         }

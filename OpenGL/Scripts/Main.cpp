@@ -36,8 +36,8 @@
 
 static const float EPS = 1.0f;
 
-static const int WINDOW_WIDTH = 1920 / 2;
-static const int WINDOW_HEIGHT = 1080 / 2;
+static const int WINDOW_WIDTH = 1920;
+static const int WINDOW_HEIGHT = 1080;
 
 int main(void)
 {
@@ -121,7 +121,7 @@ int main(void)
 
     GameObject* kazuha = scene.LoadModel("../Resources/Models/Kazuha/KAZUHA.fbx", "Kazuha");
     kazuha->GetTransform().SetPosition(glm::vec3(0.0f, 1.0f, 3.0f));
-    kazuha->GetTransform().SetRotation(glm::vec3(-90.0f, 0.0f, 0.0f));
+    // kazuha->GetTransform().SetRotation(glm::vec3(-90.0f, 0.0f, 0.0f));
 
     GameObject* firefly = scene.LoadModel("../Resources/Models/Firefly/firefly.fbx", "firefly");
     firefly->GetTransform().SetPosition(glm::vec3(2.0f, 2.0f, 0.0f));
@@ -242,8 +242,6 @@ int main(void)
         renderer.RenderAllLights(scene, lightUBO);
 
         renderer.RenderLightGizmos(scene, cameraComp, gizmoShader, &pointLightIcon, &dirLightIcon);
-
-        // scene.DestroyGameObject(Sponza); 
 
         {
             // 例如按下 F 键销毁 Sponza，同时用 ImGui 打印 scene.GetMeshRenderers().size()

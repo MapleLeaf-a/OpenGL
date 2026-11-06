@@ -4,19 +4,21 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/quaternion.hpp"
 
+class GameObject;
+
 class Transform
 {
 public:
-	Transform() : m_LocalPosition(0.0f),
+	Transform(GameObject* owner) : m_LocalPosition(0.0f),
 	 m_LocalRotation(glm::quat(1.0f, 0.0f, 0.0f, 0.0f)),
-	 m_LocalScale(1.0f), m_Parent(nullptr), m_Dirty(true) { UpdateModelMatrix(); }
+	 m_LocalScale(1.0f), m_Parent(nullptr), m_Dirty(true), m_Owner(owner) { UpdateModelMatrix(); }
 
-	Transform(const glm::vec3& position, const glm::quat& quaternion, const glm::vec3& scale)
-		: m_LocalPosition(position), m_LocalRotation(quaternion), m_LocalScale(scale), m_Parent(nullptr), m_Dirty(true)
+	Transform(const glm::vec3& position, const glm::quat& quaternion, const glm::vec3& scale, GameObject* owner)
+		: m_LocalPosition(position), m_LocalRotation(quaternion), m_LocalScale(scale), m_Parent(nullptr), m_Dirty(true), m_Owner(owner)
 		{ UpdateModelMatrix(); }
 
-	Transform(const glm::vec3& position, const glm::vec3& eulerDegrees, const glm::vec3& scale)
-		: m_LocalPosition(position), m_LocalScale(scale), m_Parent(nullptr), m_Dirty(true) 
+	Transform(const glm::vec3& position, const glm::vec3& eulerDegrees, const glm::vec3& scale, GameObject* owner)
+		: m_LocalPosition(position), m_LocalScale(scale), m_Parent(nullptr), m_Dirty(true), m_Owner(owner)
 	{
 		SetRotation(eulerDegrees); //用欧拉角设置旋转
 		UpdateModelMatrix();
@@ -25,16 +27,32 @@ public:
 	//父子层级
 	void SetParent(Transform* parent)
 	{
-		m_Parent = parent;
-		m_Dirty = true;
+		if (m_Parent == parent) return;
+
+        if (m_Parent != nullptr)
+        { //如果已经有父物体，从旧父物体中移除自己
+            m_Parent->DetachChild(this);
+        }
+        m_Parent = parent; //设置新父物体
+        if (parent)
+        {    
+            parent->AttachChild(this); //把自己加入新父物体的子列表
+        }
+
+		SetDirty();
 	}
 	Transform* GetParent() const { return m_Parent; }
+    const std::vector<Transform*>& GetChildren() const { return m_Children; }
+
+	//设置和获取所属的GameObject
+	void SetOwner(GameObject* owner) { m_Owner = owner; }
+	GameObject* GetOwner() const { return m_Owner; }
 
 	//设置位置
 	void SetPosition(const glm::vec3& pos)
 	{
 		m_LocalPosition = pos;
-		m_Dirty = true; 
+		SetDirty();
 	}
 	const glm::vec3& GetPosition() const { return m_LocalPosition; }
 
@@ -45,13 +63,13 @@ public:
 		glm::quat qy = glm::angleAxis(glm::radians(-eulerDegrees.y), glm::vec3(0, 1, 0));
 		glm::quat qz = glm::angleAxis(glm::radians(eulerDegrees.z), glm::vec3(0, 0, 1));
 		m_LocalRotation = qz * qy * qx; //依次左乘应用变换
-		m_Dirty = true; 
+		SetDirty();
 	}
 	//直接设置旋转
 	void SetRotation(const glm::quat& quat)
 	{
 		m_LocalRotation = quat;
-		m_Dirty = true;
+		SetDirty();
 	}
 	//获取欧拉角,因为是临时局部变量不能返回引用,只能拷贝
 	glm::vec3 GetEulerAngles() const 
@@ -65,12 +83,12 @@ public:
 	void SetScale(const glm::vec3& scale) 
 	{
 		m_LocalScale = scale;
-		m_Dirty = true; 
+		SetDirty(); 
 	}
 	const glm::vec3& GetScale() const { return m_LocalScale; }
 
 	//获取世界坐标
-	glm::vec3 GetWorldPosition()
+	glm::vec3 GetWorldPosition() const
     {
         glm::mat4 world = GetModelMatrix();
         return glm::vec3(world[3][0], world[3][1], world[3][2]);
@@ -98,30 +116,30 @@ public:
 	}
 
 	//获取世界坐标系下的前方(考虑完整的父子层级,会累计父物体的变换)
-	glm::vec3 GetWorldForward()
+	glm::vec3 GetWorldForward() const
     {
         glm::mat4 world = GetModelMatrix();
         return glm::normalize(glm::vec3(world * glm::vec4(0, 0, -1, 0)));
     }
 
 	//获取世界坐标系下的右方
-    glm::vec3 GetWorldRight()
+    glm::vec3 GetWorldRight() const
     {
         glm::mat4 world = GetModelMatrix();
         return glm::normalize(glm::vec3(world * glm::vec4(1, 0, 0, 0)));
     }
 
 	//获取世界坐标系下的上方
-    glm::vec3 GetWorldUp()
+    glm::vec3 GetWorldUp() const
     {
         glm::mat4 world = GetModelMatrix();
         return glm::normalize(glm::vec3(world * glm::vec4(0, 1, 0, 0)));
     }
 
 	//获取世界坐标系下的Model矩阵
-	const glm::mat4& GetModelMatrix() 
+	const glm::mat4& GetModelMatrix() const
 	{
-        if (IsDirtyRecursive()) //如果自己或者任何父物体有变换,就需要更新世界矩阵 
+        if (m_Dirty)
 		{
             UpdateModelMatrix();
         }
@@ -132,7 +150,7 @@ public:
 	void Rotate(const glm::quat& quat)
 	{
 		m_LocalRotation = quat * m_LocalRotation; //左乘,沿世界坐标系作用旋转
-		m_Dirty = true;
+		SetDirty();
 	}
 	//用轴角旋转
 	void Rotate(const glm::vec3& axis, float angleDegrees)
@@ -157,23 +175,35 @@ public:
 	void Translate(const glm::vec3& translation)
 	{
 		m_LocalPosition += translation;
-		m_Dirty = true;
+		SetDirty();
 	}
 
 	//让Transform朝向目标位置
 	void LookAt(const Transform& worldTarget, const glm::vec3& worldUp = glm::vec3(0, 1, 0))
 	{
-        glm::vec3 lookDir = glm::normalize(worldTarget.GetPosition() - this->GetPosition());
-        glm::vec3 right = glm::normalize(glm::cross(lookDir, glm::vec3(0, 1, 0))); //通过叉乘lookDir和世界坐标的Up(0,1,0)得到right
+        glm::vec3 lookDir = glm::normalize(worldTarget.GetWorldPosition() - this->GetWorldPosition());
+        glm::vec3 right = glm::normalize(glm::cross(lookDir, worldUp)); //通过叉乘lookDir和世界坐标的Up(0,1,0)得到right
         glm::vec3 up = glm::normalize(glm::cross(right, lookDir));
 
        	glm::mat3 basis(right, up, -lookDir); //列主序的旋转矩阵:X=right,Y=up,Z=-lookDir(因为本地forward是-Z)
 		SetRotation(glm::quat_cast(basis));
-		m_Dirty = true;
+		SetDirty();
 	}
 
 private:
-	void UpdateModelMatrix() 
+    mutable	glm::mat4 m_WorldMatrix; //世界矩阵
+	//本地坐标系(未考虑父物体)
+	glm::quat m_LocalRotation;   //四元数存储旋转,计算量更小且避免万向锁
+	glm::vec3 m_LocalPosition;  
+	glm::vec3 m_LocalScale;
+
+	Transform* m_Parent = nullptr; //父物体指针
+	std::vector<Transform*> m_Children; //子物体指针列表
+	GameObject* m_Owner; //拥有这个Transform的GO
+	
+	mutable bool m_Dirty;
+
+	void UpdateModelMatrix() const
 	{
 		glm::mat4 local = GetLocalMatrix();
 
@@ -189,23 +219,30 @@ private:
         m_Dirty = false;
     }
 
-	//递归地去检查父物体是否dirty
-	bool IsDirtyRecursive() const
+	//从父开始递归地设置所有子为脏
+	void SetDirty()
 	{
-		if (m_Dirty) return true;
-		return m_Parent && m_Parent->IsDirtyRecursive();
+		//若父已脏，子必然脏，剪枝
+		if (m_Dirty) return;
+		m_Dirty = true;
+		for (Transform* child : m_Children)
+		{
+			child->SetDirty();
+		}
 	}
 
-	glm::mat4 m_WorldMatrix; //世界矩阵
-	//本地坐标系(未考虑父物体)
-	glm::quat m_LocalRotation;   //四元数存储旋转,计算量更小且避免万向锁
-	glm::vec3 m_LocalPosition;  
-	glm::vec3 m_LocalScale;
-
-	Transform* m_Parent = nullptr; //父物体指针
-	std::vector<Transform*> m_Children; //子物体指针列表
-	GameObject* m_Owner; //拥有这个Transform的GO
-	
-	bool m_Dirty;
+	void AttachChild(Transform* child)
+    {
+        if (!child || child == this) return;
+        m_Children.push_back(child);
+    }
+	void DetachChild(Transform* child) 
+    {
+        auto it = std::find(m_Children.begin(), m_Children.end(), child);
+        if (it != m_Children.end())
+        {
+            m_Children.erase(it);
+		}
+    }
 };
 
