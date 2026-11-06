@@ -119,9 +119,11 @@ int main(void)
     GameObject* sphere = scene.CreateSphere<BlinnPhongMaterial>("Sphere", 48, glm::vec3(0.8f, 0.2f, 0.2f), glm::vec3(1.0f), 200);
     sphere->GetTransform().SetPosition(glm::vec3(0.0f, 2.0f, 0.0f));
 
+    GameObject* kazuhaRoot = scene.CreateGameObject("KazuhaRoot");
     GameObject* kazuha = scene.LoadModel("../Resources/Models/Kazuha/KAZUHA.fbx", "Kazuha");
-    kazuha->GetTransform().SetPosition(glm::vec3(0.0f, 1.0f, 3.0f));
-    // kazuha->GetTransform().SetRotation(glm::vec3(-90.0f, 0.0f, 0.0f));
+    kazuha->GetTransform().SetRotation(glm::vec3(-90.0f, 180.0f, 0.0f));
+    kazuha->SetParent(kazuhaRoot);
+    kazuhaRoot->GetTransform().SetPosition(glm::vec3(0.0f, 1.0f, 3.0f));
 
     GameObject* firefly = scene.LoadModel("../Resources/Models/Firefly/firefly.fbx", "firefly");
     firefly->GetTransform().SetPosition(glm::vec3(2.0f, 2.0f, 0.0f));
@@ -203,7 +205,7 @@ int main(void)
         //更新场景
         scene.OnUpdate(Time::DeltaTime());
 
-        kazuha->GetTransform().LookAt(camTransform);
+        kazuhaRoot->GetTransform().LookAt(camTransform);
         cube->GetTransform().LookAt(camTransform);
 
         glClearColor(0.5f, 0.8f, 0.9f, 1.0f); //设置默认颜色

@@ -15,6 +15,7 @@ class GameObject
 public:
     GameObject(const std::string& name = "GameObject") : m_Name(name), m_Transform(this), m_Components() {}
 
+    //设置父Transform(转发到Transform执行)
     void SetParent(GameObject* parent)
     {
         m_Transform.SetParent(parent ? &parent->m_Transform : nullptr);
