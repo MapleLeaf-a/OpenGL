@@ -178,6 +178,10 @@ int main(void)
 
 
     ImGui::CreateContext();
+
+    ImGuiIO& io = ImGui::GetIO();
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui::StyleColorsDark();
     ImGui_ImplOpenGL3_Init();
@@ -218,6 +222,7 @@ int main(void)
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
+        ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
 
         //渲染深度Pass
         renderer.RenderShadowPass(scene, light, shadowMap, shadowShader);
