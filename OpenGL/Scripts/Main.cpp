@@ -33,6 +33,7 @@
 #include "Input.h"
 
 #include "Time/Time.h"
+#include "FrameBuffer.h"
 
 static const float EPS = 1.0f;
 
@@ -134,6 +135,8 @@ int main(void)
     Sponza->GetTransform().SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
     Sponza->GetTransform().SetScale(glm::vec3(0.1f, 0.1f, 0.1f));
 
+    FrameBuffer sceneFBO({.Width = WINDOW_WIDTH, .Height = WINDOW_WIDTH, .HasColor = true});
+
     //着色器相关
     std::string vertFilePath = "Shaders/BlinnPhongShaders/vert.shader";
     std::string fragFilePath = "Shaders/BlinnPhongShaders/frag.shader";
@@ -212,21 +215,26 @@ int main(void)
         kazuhaRoot->GetTransform().LookAt(camTransform);
         cube->GetTransform().LookAt(camTransform);
 
-        glClearColor(0.5f, 0.8f, 0.9f, 1.0f); //设置默认颜色
-
-        ///* Render here */
-        //glClear(GL_COLOR_BUFFER_BIT);
-        renderer.Clear();
-
-    
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
         ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
 
+        //imgui scene开始
+        ImGui::Begin("Scene");
+        //在绑定之前resize,否则绑定过程中resize会导致白渲染了
+        ImVec2 avail = ImGui::GetContentRegionAvail(); //获取当前窗口/面板中，从当前位置到边缘还剩多少可用空间（宽和高）,返回一个 ImVec2，代表当前光标位置到面板右下角的剩余空间
+        sceneFBO.Resize((int)avail.x, (int)avail.y);        // 跟随面板大小
+        //绑定场景FBO
+        sceneFBO.Bind();
+
+        glClearColor(0.5f, 0.8f, 0.9f, 1.0f); //设置默认颜色
+        ///* Render here */
+        //glClear(GL_COLOR_BUFFER_BIT);
+        // renderer.Clear();
+
         //渲染深度Pass
         renderer.RenderShadowPass(scene, light, shadowMap, shadowShader);
-
 
         //主渲染Pass
         shader.Bind();
@@ -353,6 +361,16 @@ ImGui::Text("MeshRenderers: %d", (int)scene.GetMeshRenderers().size());
 
             ImGui::End();
         }
+
+        
+        //解绑场景FBO
+        sceneFBO.Unbind();
+        
+        
+        ImGui::Image((ImTextureID)(intptr_t)sceneFBO.GetColorTexture(), //把GPU显存里的纹理画出来,(intptr_t)：把 32 位/64 位的整数安全地转换成指针大小的整数类型
+                    avail, //指定这张图片要画多大
+                    ImVec2(0, 1), ImVec2(1, 0));           // ← UV 上下翻转,OpenGL 纹理原点在左下，ImGui 在左上，不翻的话画面是倒的
+        ImGui::End(); //imgui scene结束
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
