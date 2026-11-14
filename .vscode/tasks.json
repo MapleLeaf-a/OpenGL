@@ -55,6 +55,12 @@
                 "/I",
                 "${workspaceFolder}\\OpenGL\\Scripts\\Input",
                 "/I",
+                "${workspaceFolder}\\OpenGL\\Scripts\\Shaders",
+                "/I",
+                "${workspaceFolder}\\OpenGL\\Scripts\\Time",
+                "/I",
+                "${workspaceFolder}\\OpenGL\\Scripts\\EditorPanel",
+                "/I",
                 "${workspaceFolder}\\Dependencies\\GLFW\\include",
                 "/I",
                 "${workspaceFolder}\\Dependencies\\GLEW\\include",
@@ -63,7 +69,7 @@
 
                 "${workspaceFolder}\\OpenGL\\Scripts\\Main.cpp",
                 "${workspaceFolder}\\OpenGL\\Scripts\\Render\\Renderer.cpp",
-                "${workspaceFolder}\\OpenGL\\Scripts\\Shader.cpp",
+                "${workspaceFolder}\\OpenGL\\Scripts\\Shaders\\Shader.cpp",
                 "${workspaceFolder}\\OpenGL\\Scripts\\Texture.cpp",
                 "${workspaceFolder}\\OpenGL\\Scripts\\IndexBuffer.cpp",
                 "${workspaceFolder}\\OpenGL\\Scripts\\VertexArray.cpp",
@@ -106,9 +112,42 @@
             },
             "problemMatcher": ["$msCompile"],
             "dependsOn": ["创建 build 文件夹"],
+            "group": "build"
+        },
+        {
+            "label": "CMake: 配置",
+            "type": "process",
+            "command": "cmake",
+            "args": [
+                "-S", "${workspaceFolder}",
+                "-B", "${workspaceFolder}\\build\\cmake-build",
+                "-G", "Visual Studio 17 2022",
+                "-A", "x64"
+            ],
+            "problemMatcher": [],
+            "detail": "配置 CMake 工程（自动递归收集源文件与 include 目录，移动/新增文件无需改配置）",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+        {
+            "label": "CMake: 构建 Release",
+            "type": "process",
+            "command": "cmake",
+            "args": [
+                "--build", "${workspaceFolder}\\build\\cmake-build",
+                "--config", "Release",
+                "--parallel"
+            ],
+            "dependsOn": "CMake: 配置",
+            "problemMatcher": ["$msCompile"],
             "group": {
                 "kind": "build",
                 "isDefault": true
+            },
+            "detail": "构建到 build/cmake-build/Release/OpenGL.exe",
+            "options": {
+                "cwd": "${workspaceFolder}"
             }
         }
     ],

@@ -8,12 +8,13 @@
             "name": "(Windows) 启动 OpenGL.exe",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "${workspaceFolder}\\OpenGL\\build\\OpenGL.exe",
+            "program": "${workspaceFolder}\\build\\cmake-build\\Release\\OpenGL.exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}\\OpenGL\\Scripts",
             "environment": [],
-            "console": "externalTerminal"
+            "console": "externalTerminal",
+            "preLaunchTask": "CMake: 构建 Release"
         }
     ]
 }
