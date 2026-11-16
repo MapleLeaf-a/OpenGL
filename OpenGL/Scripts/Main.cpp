@@ -6,9 +6,6 @@
 
 #include "Renderer.h"
 
-#include "VertexBuffer.h"
-#include "IndexBuffer.h"
-#include "VertexArray.h"
 #include "Shader.h"
 #include "VertexBufferLayout.h"
 #include "Texture.h"
@@ -29,11 +26,13 @@
 #include "MeshRenderer.h"
 #include "Scene.h"
 #include "LightUBO.h"
+#include "FrameBuffer.h"
 
 #include "Input.h"
 
 #include "Time/Time.h"
-#include "FrameBuffer.h"
+
+#include "EditorPanel.h"
 
 static const float EPS = 1.0f;
 
@@ -219,6 +218,8 @@ int main(void)
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
         ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
+
+        EditorPanel::DrawHierachy(scene);
 
         //imgui scene开始
         ImGui::Begin("Scene");
