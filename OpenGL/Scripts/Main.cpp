@@ -36,8 +36,8 @@
 
 static const float EPS = 1.0f;
 
-static const int WINDOW_WIDTH = 1920;
-static const int WINDOW_HEIGHT = 1080;
+static const int WINDOW_WIDTH = 1920 / 2;
+static const int WINDOW_HEIGHT = 1080 / 2;
 
 int main(void)
 {
