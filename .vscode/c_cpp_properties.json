@@ -3,7 +3,6 @@
         {
             "name": "Win32",
             "includePath": [
-                "${workspaceFolder}/**",
                 "${workspaceFolder}/OpenGL/Scripts",
                 "${workspaceFolder}/OpenGL/Scripts/Components",
                 "${workspaceFolder}/OpenGL/Scripts/Components/Materials",
@@ -14,7 +13,6 @@
                 "${workspaceFolder}/OpenGL/Scripts/Light",
                 "${workspaceFolder}/OpenGL/Scripts/Shadow",
                 "${workspaceFolder}/OpenGL/Scripts/Input",
-                "${workspaceFolder}/OpenGL/Scripts/Time",
                 "${workspaceFolder}/OpenGL/Scripts/EditorPanel",
                 "${workspaceFolder}/OpenGL/Scripts/Shaders",
                 "${workspaceFolder}/OpenGL/Scripts/vendor",
@@ -29,7 +27,7 @@
                 "GLEW_STATIC"
             ],
             "windowsSdkVersion": "10.0.26100.0",
-            "compilerPath": "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe",
+            "compilerPath": "C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/MSVC/14.51.36231/bin/Hostx64/x64/cl.exe",
             "cStandard": "c17",
             "cppStandard": "c++20",
             "intelliSenseMode": "windows-msvc-x64"
