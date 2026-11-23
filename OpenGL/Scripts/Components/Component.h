@@ -20,6 +20,12 @@ public:
 
     Transform* GetTransform() const;
 
+    //获取Component的类型名称
+    virtual const char* GetTypeName() const { return "Component"; }
+    
+    //组件自绘制
+    virtual void DrawInspectorGUI() {}
+
 private:
     GameObject* m_Owner = nullptr; //裸指针,只"观察",不拥有
 };

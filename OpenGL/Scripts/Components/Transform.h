@@ -71,8 +71,8 @@ public:
 		m_LocalRotation = quat;
 		SetDirty();
 	}
-	//获取欧拉角,因为是临时局部变量不能返回引用,只能拷贝
-	glm::vec3 GetEulerAngles() const 
+	//获取欧拉角
+	glm::vec3 GetEulerAngles() const //因为是临时局部变量不能返回引用,只能拷贝
 	{
 		glm::vec3 euler = glm::degrees( glm::eulerAngles(m_LocalRotation) );
 		euler.y = -euler.y;

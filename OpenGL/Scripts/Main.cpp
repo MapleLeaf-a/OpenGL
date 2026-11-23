@@ -36,8 +36,8 @@
 
 static const float EPS = 1.0f;
 
-static const int WINDOW_WIDTH = 1920;
-static const int WINDOW_HEIGHT = 1080;
+static const int WINDOW_WIDTH = 2560;
+static const int WINDOW_HEIGHT = 1600;
 
 int main(void)
 {
@@ -105,8 +105,8 @@ int main(void)
     Scene scene;
 
     GameObject* mainCamera = scene.CreateCamera("MainCamera");
-    mainCamera->GetTransform().SetPosition(glm::vec3(0.0f, 5.0f, 12.0f));
-    mainCamera->GetTransform().SetRotation(glm::vec3(-20.0f, 0.0f, 0.0f));
+    mainCamera->GetTransform().SetPosition(glm::vec3(0.0f, 5.0f, -12.0f));
+    mainCamera->GetTransform().SetRotation(glm::vec3(-20.0f, 180.0f, 0.0f));
 
     CameraComponent* cameraComp = mainCamera->GetComponent<CameraComponent>();
 
@@ -125,10 +125,12 @@ int main(void)
     kazuha->SetParent(kazuhaRoot);
     kazuhaRoot->GetTransform().SetPosition(glm::vec3(0.0f, 1.0f, 3.0f));
 
+    GameObject* fireflyRoot = scene.CreateGameObject("FireflyRoot");
     GameObject* firefly = scene.LoadModel("../Resources/Models/Firefly/firefly.fbx", "firefly");
-    firefly->GetTransform().SetPosition(glm::vec3(2.0f, 2.0f, 0.0f));
-    firefly->GetTransform().SetRotation(glm::vec3(-90.0f, 0.0f, 0.0f));
+    firefly->GetTransform().SetRotation(glm::vec3(-90.0f, 180.0f, 0.0f));
     firefly->GetTransform().SetScale(glm::vec3(0.1f, 0.1f, 0.1f));
+    firefly->SetParent(fireflyRoot);
+    fireflyRoot->GetTransform().SetPosition(glm::vec3(2.0f, 2.0f, 0.0f));   
 
     GameObject* Sponza = scene.LoadModel("../Resources/Models/Sponza/Sponza.obj", "Sponza");
     Sponza->GetTransform().SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
@@ -220,6 +222,8 @@ int main(void)
         ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
 
         EditorPanel::DrawHierachy(scene);
+        EditorPanel::DrawInspector(scene);
+        EditorPanel::DrawStats(scene);
 
         //imgui scene开始
         ImGui::Begin("Scene");
@@ -260,14 +264,6 @@ int main(void)
         renderer.RenderLightGizmos(scene, cameraComp, gizmoShader, &pointLightIcon, &dirLightIcon);
 
         {
-            // 例如按下 F 键销毁 Sponza，同时用 ImGui 打印 scene.GetMeshRenderers().size()
-//DeubugOnly
-if (Input::GetKeyDown(KeyCode::F)) 
-{
-    scene.DestroyGameObject(Sponza);
-}
-ImGui::Text("MeshRenderers: %d", (int)scene.GetMeshRenderers().size());
-
             if (Input::GetMouseButton(MouseButton::Right))
             {
                 glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); //按住右键隐藏光标
@@ -314,8 +310,6 @@ ImGui::Text("MeshRenderers: %d", (int)scene.GetMeshRenderers().size());
             }
 
             ImGui::Begin("Camera Transform");
-            
-            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
             
             // ---- 位置控制 ----
             ImGui::Text("Position");

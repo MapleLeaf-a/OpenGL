@@ -10,7 +10,8 @@ namespace EditorPanel
     inline GameObject* selectedGO = nullptr; //cpp17 inline变量:header-only被多处include也只有一个实例。在 C++17 之前，如果你在头文件中定义一个全局变量（非 const 或 constexpr），当这个头文件被多个源文件包含时，链接器会报“多重定义”错误
 
     
-    inline void DrawNode(Scene& scene, GameObject* go);
+    inline void DrawNode(Scene& scene, GameObject* go); //前向声明给DrawHierachy调用
+    
     //在面板上绘制所有GO&处理面板点击
     inline void DrawHierachy(Scene& scene)
     {
@@ -90,4 +91,58 @@ namespace EditorPanel
         glm::vec3 scale = t.GetScale();
         if (ImGui::DragFloat3("Scale", &scale.x, 0.1f)) t.SetScale(scale);
     }
+
+
+    //绘制Inspector
+    inline void DrawInspector(const Scene& scene)
+    {
+        ImGui::Begin("Inspector");
+        
+        if (!selectedGO) //没有GO被选中 
+        {
+            ImGui::TextDisabled("Click a GO to show its inspector"); //显示灰暗色文本
+            ImGui::End();
+            return;
+        }
+
+        //Inspector改名功能
+        char nameBuf[128]; //c风格字符串
+        std::strncpy(nameBuf, selectedGO->GetName().c_str(), sizeof(nameBuf) - 1); //127字符,超过会截断不会缓冲区溢出
+        nameBuf[sizeof(nameBuf) - 1] = '\0'; //c风格字符串末尾\0
+        if (ImGui::InputText("Name", nameBuf, sizeof(nameBuf))) //ImGui::InputText 的底层是 C 风格的，它需要一个预先分配好内存的字符数组（缓冲区）来让你打字。所以必须走一遍 string -> char[] -> 修改后 -> string 的流程
+        {
+            selectedGO->SetName(nameBuf);
+        }
+
+        ImGui::Separator(); //画一条分割线
+
+        if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen)) //可折叠的标题栏
+        {
+            DrawTransform(selectedGO->GetTransform());
+        }
+
+        for (const auto& comp : selectedGO->GetComponents())
+        {
+            ImGui::PushID(comp.get()); //防止多个同类型组件ID重名冲突
+            if (ImGui::CollapsingHeader(comp->GetTypeName(), ImGuiTreeNodeFlags_DefaultOpen))
+            {
+                comp->DrawInspectorGUI();
+            }
+            ImGui::PopID();
+        }
+
+        ImGui::End();
+    }
+
+    
+    //绘制帧率
+    inline void DrawStats(const Scene& scene)
+    {
+        ImGui::Begin("Stats");
+        ImGui::Text("%.3f ms / frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+        ImGui::Text("MeshRenderers: %d", (int) scene.GetMeshRenderers().size());
+        ImGui::End();
+    }
+
+    
 }

@@ -71,7 +71,13 @@ public:
         }
     }
 
+    void SetName(const std::string& name)
+    {
+        m_Name = name; //拷贝赋值
+    }
     const std::string& GetName() const { return m_Name; }
+
+    const std::vector<std::unique_ptr<Component>>& GetComponents() const { return m_Components; }
 
 private:
     // GameObject* m_Parent = nullptr; //父物体指针
