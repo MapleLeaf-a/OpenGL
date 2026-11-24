@@ -56,13 +56,13 @@ public:
 	}
 	const glm::vec3& GetPosition() const { return m_LocalPosition; }
 
-	//用欧拉角设置旋转
+	//用欧拉角设置旋转，旋转序同Unity一致(ZXY)，当X为90°时会不可避免地出现万向锁问题
 	void SetRotation(const glm::vec3& eulerDegrees)
 	{
 		glm::quat qx = glm::angleAxis(glm::radians(eulerDegrees.x), glm::vec3(1, 0, 0)); //用x(归一化的)轴和一个弧度角构建一个四元数
 		glm::quat qy = glm::angleAxis(glm::radians(-eulerDegrees.y), glm::vec3(0, 1, 0));
 		glm::quat qz = glm::angleAxis(glm::radians(eulerDegrees.z), glm::vec3(0, 0, 1));
-		m_LocalRotation = qz * qy * qx; //依次左乘应用变换
+		m_LocalRotation = qy * qx * qz; //依次左乘应用变换,Z-X-Y
 		SetDirty();
 	}
 	//直接设置旋转
@@ -74,9 +74,12 @@ public:
 	//获取欧拉角
 	glm::vec3 GetEulerAngles() const //因为是临时局部变量不能返回引用,只能拷贝
 	{
-		glm::vec3 euler = glm::degrees( glm::eulerAngles(m_LocalRotation) );
-		euler.y = -euler.y;
-		return euler;
+		//从旋转矩阵R=R(-y)R(x)R(z)去反解欧拉角xyz
+		const glm::mat3 R = glm::mat3_cast(m_LocalRotation);   //列主序:R[列][行]
+		const float x = glm::degrees(std::asin(glm::clamp(-R[2][1], -1.0f, 1.0f)));
+		const float z = glm::degrees(std::atan2(R[0][1], R[1][1])); //arctan(R10/R11)
+		const float y = -glm::degrees(std::atan2(R[2][0], R[2][2])); //arctan(R02/R22)
+		return glm::vec3(x, y, z);
 	}
 
 	//设置Scale
