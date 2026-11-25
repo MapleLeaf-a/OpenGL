@@ -10,7 +10,10 @@ namespace EditorPanel
     //选中的GO
     inline GameObject* selectedGO = nullptr; //cpp17 inline变量:header-only被多处include也只有一个实例。在 C++17 之前，如果你在头文件中定义一个全局变量（非 const 或 constexpr），当这个头文件被多个源文件包含时，链接器会报“多重定义”错误
 
-    
+    inline bool isSelectedGOChange = false;
+    inline glm::vec3 lastEuler = glm::vec3(0.0f);
+    inline glm::vec3 euler = glm::vec3(0.0f);
+
     inline void DrawNode(Scene& scene, GameObject* go); //前向声明给DrawHierachy调用
     
     //在面板上绘制所有GO&处理面板点击
@@ -56,6 +59,7 @@ namespace EditorPanel
         //点文字选中;点箭头只展开,所以排除IsItemToggledOpen
         if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
         {
+            isSelectedGOChange = true;
             selectedGO = go;
         }
 
@@ -64,7 +68,11 @@ namespace EditorPanel
         {
             if (ImGui::MenuItem("Delete"))
             {
-                if (go == selectedGO) selectedGO = nullptr;
+                if (go == selectedGO)
+                {
+                    isSelectedGOChange = true;
+                    selectedGO = nullptr;
+                }
                 scene.DestroyGameObject(go);
             }
             ImGui::EndPopup(); //EndPopup() 只是结束代码书写，不代表关闭动作。在 ImGui 中，所有以 Begin 开头的函数，都必须以对应的 End 函数结束。这是一种“作用域”的界定
@@ -87,8 +95,20 @@ namespace EditorPanel
     {
         glm::vec3 pos = t.GetPosition();
         if (ImGui::DragFloat3("Position", &pos.x, 0.1f)) t.SetPosition(pos);
-        glm::vec3 euler = t.GetEulerAngles();
-        if (ImGui::DragFloat3("Rotation", &euler.x, 0.1f)) t.SetRotation(euler);
+        
+        if (isSelectedGOChange)
+        {
+            euler = t.GetEulerAngles();
+            lastEuler = euler;
+            isSelectedGOChange = false;
+        }
+        if (ImGui::DragFloat3("Rotation", &euler.x, 0.1f))
+        {   
+            t.Rotate(glm::vec3(1, 0, 0), euler.x - lastEuler.x);
+            t.Rotate(glm::vec3(0, 1, 0), euler.y - lastEuler.y);
+            t.Rotate(glm::vec3(0, 0, 1), euler.z - lastEuler.z);
+            lastEuler = euler;
+        }
         glm::vec3 scale = t.GetScale();
         if (ImGui::DragFloat3("Scale", &scale.x, 0.1f)) t.SetScale(scale);
     }
