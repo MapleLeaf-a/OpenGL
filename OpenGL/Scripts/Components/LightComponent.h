@@ -52,7 +52,7 @@ public:
     }
 
     //获取View矩阵
-    glm::mat4 GetLightViewMatrix() //不返回引用是因为要
+    glm::mat4 GetLightViewMatrix()
     {
         Transform* trans = GetTransform();
         

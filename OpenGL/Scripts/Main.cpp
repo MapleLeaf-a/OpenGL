@@ -105,7 +105,7 @@ int main(void)
     Scene scene;
 
     GameObject* mainCamera = scene.CreateCamera("MainCamera");
-    mainCamera->GetTransform().SetPosition(glm::vec3(0.0f, 5.0f, -12.0f));
+    mainCamera->GetTransform().SetPosition(glm::vec3(0.0f, 5.0f, -7.0f));
     mainCamera->GetTransform().SetRotation(glm::vec3(-20.0f, 180.0f, 0.0f));
 
     CameraComponent* cameraComp = mainCamera->GetComponent<CameraComponent>();
@@ -117,7 +117,7 @@ int main(void)
     plane->GetTransform().SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 
     GameObject* sphere = scene.CreateSphere<BlinnPhongMaterial>("Sphere", 48, glm::vec3(0.8f, 0.2f, 0.2f), glm::vec3(1.0f), 200);
-    sphere->GetTransform().SetPosition(glm::vec3(0.0f, 2.0f, 0.0f));
+    sphere->GetTransform().SetPosition(glm::vec3(-4.0f, 2.0f, 0.0f));
 
     GameObject* kazuhaRoot = scene.CreateGameObject("KazuhaRoot");
     GameObject* kazuha = scene.LoadModel("../Resources/Models/Kazuha/KAZUHA.fbx", "Kazuha");
@@ -156,9 +156,8 @@ int main(void)
     //创建LightUBO
     LightUBO lightUBO;
     GameObject* light = scene.CreateDirectionalLight("DirectionalLight", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), 1.0f);
-    light->GetTransform().SetPosition(glm::vec3(0.0f, 5.0f, 7.0f));
-    // light->GetTransform().SetRotation(glm::vec3(0.0f, 0.0f, 0.0f));
-    light->GetTransform().SetRotation(glm::vec3(-30.0f, 0.0f, 0.0f));
+    light->GetTransform().SetPosition(glm::vec3(-1.0f, 5.0f, -2.0f));
+    light->GetTransform().SetRotation(glm::vec3(-120.0f, 0.0f, 0.0f));
 
     GameObject* pointLight = scene.CreatePointLight("PointLight", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), 1.0f);
     pointLight->GetTransform().SetPosition(glm::vec3(0.0f, 5.0f, 0.0f));
@@ -221,7 +220,7 @@ int main(void)
         ImGui::NewFrame();
         ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
 
-        EditorPanel::DrawHierachy(scene);
+        EditorPanel::DrawHierarchy(scene);
         EditorPanel::DrawInspector(scene);
         EditorPanel::DrawStats(scene);
 
@@ -308,53 +307,6 @@ int main(void)
                 glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL); //松开右键显示光标
                 camSpeed = 5.0f;
             }
-
-            ImGui::Begin("Camera Transform");
-            
-            // ---- 位置控制 ----
-            ImGui::Text("Position");
-            glm::vec3 pos = camTransform.GetPosition();
-            if (ImGui::DragFloat3("##Pos", &pos.x, 0.1f)) {
-                camTransform.SetPosition(pos);
-            }
-            // ---- 旋转控制 ----
-            ImGui::Text("Rotation");
-
-            float itemWidth = 75.0f;  // 每个滑块的宽度
-            ImGui::PushItemWidth(itemWidth);
-
-            // Pitch
-            if (ImGui::DragFloat("##Pitch", &x, 0.1f, -180, 180))
-            {
-                camTransform.Rotate(glm::vec3(1, 0, 0), x - lastX);
-                lastX = x;
-            }
-            ImGui::SameLine();
-
-            // Yaw
-            if (ImGui::DragFloat("##Yaw", &y, 0.1f, -180, 180))
-            {
-                camTransform.Rotate(glm::vec3(0, 1, 0), y - lastY);
-                lastY = y;
-            }
-            ImGui::SameLine();
-
-            // Roll
-            if (ImGui::DragFloat("##Roll", &z, 0.1f, -180, 180))
-            {
-                camTransform.Rotate(glm::vec3(0, 0, 1), z - lastZ);
-                lastZ = z;
-            }
-
-            ImGui::PopItemWidth();
-            // ---- 缩放控制 ----
-            ImGui::Text("Scale");
-            glm::vec3 scale = camTransform.GetScale();
-            if (ImGui::DragFloat3("##Scale", &scale.x, 0.1f, 0.01f, 10.0f)) {
-                camTransform.SetScale(scale);
-            }
-
-            ImGui::End();
         }
 
         

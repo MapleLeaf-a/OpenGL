@@ -10,12 +10,12 @@ namespace EditorPanel
     //选中的GO
     inline GameObject* selectedGO = nullptr; //cpp17 inline变量:header-only被多处include也只有一个实例。在 C++17 之前，如果你在头文件中定义一个全局变量（非 const 或 constexpr），当这个头文件被多个源文件包含时，链接器会报“多重定义”错误
 
-    inline void DrawNode(Scene& scene, GameObject* go); //前向声明给DrawHierachy调用
+    inline void DrawNode(Scene& scene, GameObject* go); //前向声明给DrawHierarchy调用
     
     //在面板上绘制所有GO&处理面板点击
-    inline void DrawHierachy(Scene& scene)
+    inline void DrawHierarchy(Scene& scene)
     {
-        ImGui::Begin("Hierachy");
+        ImGui::Begin("Hierarchy");
 
         for (const std::unique_ptr<GameObject>& obj : scene.GetGameObjects())
         {
@@ -42,8 +42,7 @@ namespace EditorPanel
         const auto& children = go->GetTransform().GetChildren();
 
         ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow //默认行为：如果不加这个标志，你点击树节点的任何地方（文字、空白处），都会触发展开/折叠。加上之后：只有点击文字左侧的 小三角箭头 才会展开/折叠
-                                 | ImGuiTreeNodeFlags_SpanAvailWidth //作用：让这个树节点的选中高亮背景填满整行可用宽度。效果：就像 Unity 里点击某个物体，整个蓝色的选中条是从左拉到右的。不加这个，高亮只包住文字部分
-                                 | ImGuiTreeNodeFlags_DefaultOpen; //作用：默认展开这个节点
+                                 | ImGuiTreeNodeFlags_SpanAvailWidth; //作用：让这个树节点的选中高亮背景填满整行可用宽度。效果：就像 Unity 里点击某个物体，整个蓝色的选中条是从左拉到右的。不加这个，高亮只包住文字部分
         if (go == selectedGO) flags |= ImGuiTreeNodeFlags_Selected; //选中物体：当前行会显示一个高亮背景（通常是蓝色），表示“这个物体被选中了
         if (children.empty()) flags |= ImGuiTreeNodeFlags_Leaf  //作用：把这个节点标记为“叶子节点”。效果：它不会显示展开/折叠的小三角箭头。点击它时，不会触发展开/折叠逻辑 
                                     | ImGuiTreeNodeFlags_NoTreePushOnOpen; //作用：告诉 ImGui，当这个节点被打开时，不要调用 ImGui::TreePush()。为什么需要：因为它是叶子节点（没有子物体），即使“打开”了也没有子节点可以缩进显示。如果不加这个标志，你调用 ImGui::TreeNodeEx 后，必须配对调用 ImGui::TreePop()，否则 ImGui 的 ID 栈会错乱，导致后续 UI 崩溃。加上这个标志，就可以省去 TreePop()

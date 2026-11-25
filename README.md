@@ -1,6 +1,6 @@
 # OpenGL 手动搭建渲染引擎
 
-一个基于 **OpenGL 4.2 Core** 手写实现的轻量级 3D 渲染引擎项目（不使用现成引擎，纯手动管理 OpenGL 状态与资源），使用 **C++20** 编写。项目采用类似 Unity 的 **GameObject-Component（ECS 变体）** 架构，支持场景管理、多种材质、多光源（UBO 批量上传）、assimp 模型加载以及 ImGui 调试界面。
+一个基于 **OpenGL 4.2 Core** 手写实现的轻量级 3D 渲染引擎项目（不使用现成引擎，纯手动管理 OpenGL 状态与资源），使用 **C++20** 编写。项目采用类似 Unity 的 **GameObject-Component（ECS 变体）** 架构，支持场景管理、多种材质、多光源（UBO 批量上传）、assimp 模型加载，以及基于 ImGui **Docking** 的编辑器界面（Hierarchy / Inspector / Scene 视图 / Stats）。
 
 ![运行示例](./ReadmeImages/Result.png)
 
@@ -22,15 +22,18 @@
 - 4. **多光源系统（Light）**
   - 方向光（Directional Light）、点光源（Point Light）
   - 通过 **UBO（Uniform Buffer Object）** 批量上传最多 `MAXLIGHTS = 16` 个光源，单次 `glBufferSubData` 高效更新
-- 5. **ImGui 调试界面**
-  - 实时显示 FPS / 每帧耗时
-  - 摄像机位置、旋转（Pitch / Yaw / Roll）、缩放的拖拽控制
+- 5. **编辑器界面（ImGui Docking）+ Scene 视图**
+  - 使用 ImGui **docking 分支**，`DockSpace` 固定停靠布局：左 Hierarchy / 中 Scene / 右 Inspector / 下 Stats
+  - **Hierarchy**：按 Transform 父子层级递归展示场景物体，点击选中、右键 Delete（走延迟销毁队列，不会在遍历中 erase）
+  - **Inspector**：物体改名、Transform（位置 / 欧拉角 / 缩放）编辑；各 Component 通过虚函数 `DrawInspectorGUI()` 自绘制参数
+  - **Scene 视图**：场景先渲染到离屏 `FrameBuffer`，再用 `ImGui::Image` 显示到面板；面板缩放时同步 `glViewport`、FBO `Resize` 与相机宽高比
+  - **Stats**：FPS / 每帧耗时 / MeshRenderer 数量
 - 6. **调试友好**
   - `GLCall` / `GLClearError` / `GLPrintError` + `ASSERT` 宏，OpenGL 错误自动定位到文件与行号并触发断点
 - 7. **纯手写资源管线**：`VertexBuffer` / `IndexBuffer` / `VertexArray` / `Shader` / `Texture` 封装
 - 8. **模型加载（assimp）**：加载 FBX 等外部模型，支持多子网格拆分与贴图自动加载（拼接模型相对路径解决 assimp 相对路径问题）
 - 9. **光源图标 Billboard（公告牌）**：光源标记图标四边形始终面向相机，区分方向光 / 点光源，视觉上直观定位光源
-- 10. **硬阴影（Shadow Mapping）**：方向光阴影映射，先渲染深度 Pass 生成阴影贴图，主 Pass 采样阴影贴图实现实时阴影
+- 10. **阴影（Shadow Mapping）**：方向光深度 Pass 生成阴影贴图（复用通用 `FrameBuffer`，深度专用），主 Pass 将片元世界坐标变换到光源空间（`u_LightVP`）采样，并做 3×3 **PCF** 软化边缘
 
 ---
 
@@ -42,7 +45,7 @@
 | [GLEW](https://glew.sourceforge.net/) | OpenGL 扩展加载 | 静态链接（`GLEW_STATIC`），需最先 `#include` |
 | [assimp](https://github.com/assimp/assimp) | 模型加载 | `Dependencies/assimp` |
 | [glm](https://github.com/g-truc/glm) | 数学库（矩阵 / 向量） | `Scripts/vendor/glm`（头文件库） |
-| [ImGui](https://github.com/ocornut/imgui) | 调试 UI | `Scripts/vendor/imgui` |
+| [ImGui](https://github.com/ocornut/imgui) | 编辑器 UI | `Scripts/vendor/imgui`（**docking 分支** v1.93.1 WIP，提供停靠布局） |
 | [stb_image](https://github.com/nothings/stb) | 纹理加载 | `Scripts/vendor/stb_image` |
 
 - **语言 / 标准**：C++20
@@ -59,6 +62,7 @@ OpenGL(Manually)/
 ├── CMakeLists.txt                 # CMake 构建脚本（三平台通用）
 ├── OpenGL.sln                     # VS 解决方案（Windows 直接打开用）
 ├── Dependencies/                  # 第三方库（GLFW / GLEW / assimp 的头文件与 Windows 预编译 .lib）
+├── docs/                          # 设计笔记（如欧拉角反解 / EulerHint 推导）
 ├── OpenGL/
 │   ├── OpenGL.sln / OpenGL.vcxproj # VS 工程文件
 │   ├── build/                      # VS 构建输出
@@ -68,6 +72,8 @@ OpenGL(Manually)/
 │   └── Scripts/
 │       ├── Main.cpp                # 程序入口：窗口、场景搭建、主循环
 │       ├── Renderer.h / Renderer.cpp       # 渲染器封装 + GLCall 调试宏
+│       ├── Render/FrameBuffer.h    # 通用离屏帧缓冲（颜色/深度附件、Bind/Unbind、Resize）
+│       ├── EditorPanel/EditorPanel.h # Hierarchy / Inspector / Stats 面板
 │       ├── Shader.h / Shader.cpp           # 着色器编译 / 链接 / Uniform 设置
 │       ├── Texture.h / Texture.cpp         # 纹理封装
 │       ├── VertexBuffer / IndexBuffer / VertexArray / VertexBufferLayout   # 缓冲区与 VAO
@@ -178,22 +184,25 @@ make -j$(nproc)
 
 1. 创建 1920×1080 窗口并初始化 OpenGL 4.x 上下文；
 2. 搭建场景：主相机 + 平面（Blinn-Phong）+ 通过 assimp 加载的 `KAZUHA.fbx` / `firefly.fbx` 模型 + 球和立方体 + 方向光 / 点光源；
-3. 进入渲染主循环：每帧先执行阴影深度 Pass（硬阴影），再做主渲染 Pass 并采样阴影贴图，随后绘制光源图标（Billboard），最后叠加 ImGui 调试面板。
+3. 进入渲染主循环：每帧先执行阴影深度 Pass，随后把主渲染 Pass 渲染到 Scene 的离屏 FBO（采样阴影贴图、绘制光源 Billboard 图标），最后用 `ImGui::Image` 显示到 Scene 面板，并叠加 Hierarchy / Inspector / Stats 面板。
 
-**ImGui 面板（"Camera Transform"）**
+**编辑器面板**
 
-| 控件 | 功能 |
+| 面板 | 内容 |
 | --- | --- |
-| `Position` 拖拽框 | 设置相机位置 |
-| `Pitch / Yaw / Roll` 滑块 | 分别绕 X / Y / Z 轴旋转相机 |
-| `Scale` 拖拽框 | 缩放相机 |
+| Hierarchy | 树形展示所有根物体及其子物体；左键选中、右键 Delete |
+| Inspector | 选中物体的 Name、Transform，以及各 Component 的可编辑参数 |
+| Scene | 场景实时渲染结果（FBO 纹理），随面板大小自适应 |
+| Stats | FPS、每帧耗时、MeshRenderer 数量 |
+
+**相机操作**：按住鼠标右键进入自由视角（WASD 移动 + 鼠标转向），松开恢复。
 
 **默认场景参数**（可在 `Main.cpp` 中修改 / 取消注释）
 
-- 相机：位置 `(0, 5, 12)`，俯仰 `-20°`
-- 平面：`CreatePlane<BlinnPhongMaterial>("Plane", 10.0f, ...)`
-- 模型：`scene.LoadModel("../Resources/Models/Kazuha/KAZUHA.fbx", "Kazuha")`
-- 方向光：`CreateDirectionalLight(...)`，位置 `(0, 5, 7)`
+- 相机：位置 `(0, 5, -12)`，旋转 `(-20°, 180°, 0°)`（朝 +Z 看向场景）
+- 平面：`CreatePlane<BlinnPhongMaterial>("Plane", 20.0f, ...)`
+- 模型：`Kazuha`（`-90°, 180°, 0°` 资产轴向修正）、`Firefly`（缩放 0.1）、`Sponza`（缩放 0.1）
+- 方向光：`CreateDirectionalLight(...)`，位置 `(0, 5, 7)`，旋转 `(-30°, 0°, 0°)`
 - 点光源：`CreatePointLight(...)`，位置 `(0, 5, 0)`
 
 ---
@@ -217,6 +226,9 @@ graph TD
     LightComp --> LightUBO[LightUBO 光源 UBO]
     LightUBO --> Frag[片元着色器 LightBlock]
     Shader --> Frag
+    Editor[EditorPanel 面板] --> Scene
+    Editor --> Renderer
+    Renderer --> FBO[FrameBuffer 离屏渲染 → ImGui::Image]
 ```
 
 ### 核心要点
@@ -225,7 +237,9 @@ graph TD
 - **场景（Scene）**：以 `std::unique_ptr<GameObject>` 统一管理生命周期，通过原始指针暴露接口（注意在 `std::move` 前获取指针）。
 - **材质与网格分离**：`MeshRenderer` 组合 `Mesh` + `Material`；`Mesh::CreateCube/Plane/Sphere` 程序化生成顶点数据。
 - **多光源 UBO**：`LightUBO` 按 `std140` 布局分配 GPU 显存并绑定到 binding point 0；片元着色器 `LightBlock` 中 `Light lights[MAXLIGHTS]` 批量读取，支持方向光 / 点光源（点光源按距离平方衰减）。
-- **Transform.h**：使用四元数存储底层旋转并每次用增量来构建四元数，完美解决了欧拉角导致的**万向锁**问题
+- **Transform.h（旋转）**：底层用**四元数**存储；欧拉角只作为编辑层表示，构造顺序为 **ZXY**（与 Unity 一致），因此固有奇点落在 pitch（X）= ±90°。`GetEulerAngles()` 带 **Euler Hint** 缓存：四元数 → 欧拉角有多组等价解（周期解 ±360°k、翻转解 `(180−x, y+180, z+180)`），反解时挑选与上次编辑值最接近的一组，消除拖拽跨越 ±180° / 奇异点时的数值跳变。
+- **FrameBuffer**：通用离屏帧缓冲（颜色 + 深度附件）。`Bind/Unbind` 会保存并恢复**此前绑定的 FBO 与视口**，因此阴影 Pass 嵌套在 Scene FBO 内也不会把渲染目标弄丢；`Resize` 按面板尺寸重建附件。Scene 面板与阴影贴图共用这套实现。
+- **EditorPanel**：Header-only 的编辑器面板集合。Hierarchy 依据 `Transform::GetChildren()` 递归，只有根节点作为入口（避免重复绘制）；Inspector 用 `PushID(组件指针)` 保证同类型多组件不串 ID；选中指针失效时通过 `Scene::Contains()` 校验，避免悬空引用。
 - **Billboard（公告牌）**：光源图标使用一个共用四边形 Mesh，通过 `lookDir`（相机 `-forward`）、`right`、`up` 叉乘构造始终朝向相机的旋转矩阵，实现贴图永远面对相机
 - **硬阴影（Shadow Mapping）**：第一趟用 `shadowShader` 从光源视角把场景深度渲染到 `ShadowMap`（FBO + 深度纹理），主渲染时把片元世界坐标变换到光源空间（`u_LightVP`）采样阴影贴图，`currentDepth > closestDepth` 即判定为阴影
 - **模型加载**：`Model` 递归处理 assimp 节点树，每个子网格生成一个 `GameObject` + `MeshRenderer`；贴图路径拼接模型目录解决相对路径 / 中文路径导致的加载失败
@@ -253,6 +267,12 @@ graph TD
 - [x] 阴影映射（Shadow Mapping）
 - [x] 纹理贴图接入（`Texture` 类已封装，`Main.cpp` 中留有示例）
 - [x] 相机自由飞行控制（WASD + 鼠标）
+- [ ] 完成对ImGUI各窗口排布的预设
+- [ ] 修复方向光阴影和光源位置有关的问题（正确应为无关）(修复思路应该是LightComponent的GetLightViewMatrix的pos应该为相机视锥最小包围球的球心)
+- [ ] 修复Hierarchy的？？问题（可能是中文乱码）
+- [ ] 完成各Component在Inspector里的自绘制
+- [ ] ImGuizmo 平移 / 旋转 / 缩放 Gizmo（旋转用轴角增量，绕开欧拉编辑的固有奇点）
+- [ ] SSAO和RSM
 - [ ] 法线贴图 / 环境贴图（IBL）
 - [ ] PBR 材质完善（`PBRMaterial.h` 已有基类）
 
