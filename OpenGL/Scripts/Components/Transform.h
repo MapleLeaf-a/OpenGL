@@ -64,22 +64,28 @@ public:
 		glm::quat qz = glm::angleAxis(glm::radians(eulerDegrees.z), glm::vec3(0, 0, 1));
 		m_LocalRotation = qy * qx * qz; //依次左乘应用变换,Z-X-Y
 		SetDirty();
+
+		m_EulerHint      = eulerDegrees;   
+		m_EulerHintValid = true;           
+		m_HasEulerHint   = true; 
 	}
 	//直接设置旋转
 	void SetRotation(const glm::quat& quat)
 	{
 		m_LocalRotation = quat;
 		SetDirty();
+
+		m_EulerHintValid = false;
 	}
 	//获取欧拉角
 	glm::vec3 GetEulerAngles() const //因为是临时局部变量不能返回引用,只能拷贝
 	{
-		//从旋转矩阵R=R(-y)R(x)R(z)去反解欧拉角xyz
-		const glm::mat3 R = glm::mat3_cast(m_LocalRotation);   //列主序:R[列][行]
-		const float x = glm::degrees(std::asin(glm::clamp(-R[2][1], -1.0f, 1.0f)));
-		const float z = glm::degrees(std::atan2(R[0][1], R[1][1])); //arctan(R10/R11)
-		const float y = -glm::degrees(std::atan2(R[2][0], R[2][2])); //arctan(R02/R22)
-		return glm::vec3(x, y, z);
+		if (!m_EulerHintValid)
+		{
+			m_EulerHint = ComputeEulerNearestHint();
+			m_EulerHintValid = true;
+		}
+		return m_EulerHint;
 	}
 
 	//设置Scale
@@ -154,6 +160,8 @@ public:
 	{
 		m_LocalRotation = quat * m_LocalRotation; //左乘,沿世界坐标系作用旋转
 		SetDirty();
+
+		m_EulerHintValid = false;
 	}
 	//用轴角旋转
 	void Rotate(const glm::vec3& axis, float angleDegrees)
@@ -161,6 +169,8 @@ public:
 		glm::vec3 a(axis.x, -axis.y, axis.z);
 		glm::quat quat = glm::angleAxis(glm::radians(angleDegrees), glm::normalize(a));
 		Rotate(quat);
+
+		m_EulerHintValid = false;
 	}
 
 	//获取矩阵是否需要更新的标志
@@ -206,6 +216,10 @@ private:
 	
 	mutable bool m_Dirty;
 
+	mutable glm::vec3 m_EulerHint{0.0f}; 
+	mutable bool m_EulerHintValid = false;
+	mutable bool m_HasEulerHint = false; 
+
 	void UpdateModelMatrix() const
 	{
 		glm::mat4 local = GetLocalMatrix();
@@ -247,5 +261,40 @@ private:
             m_Children.erase(it);
 		}
     }
+
+
+	//将v±(n * 360°)归约到离ref最近的角度
+	static inline float ToNearestDegree(float v, float ref)
+	{
+		return v + 360.0f * glm::round((ref - v) / 360.0f);
+	}
+
+	//计算最近的欧拉角Hint
+	glm::vec3 ComputeEulerNearestHint() const
+	{
+		//从旋转矩阵R=R(-y)R(x)R(z)去反解欧拉角xyz
+		const glm::mat3 R = glm::mat3_cast(m_LocalRotation);   //列主序:R[列][行]
+		const float x = glm::degrees(std::asin(glm::clamp(-R[2][1], -1.0f, 1.0f)));
+		const float z = glm::degrees(std::atan2(R[0][1], R[1][1])); //arctan(R10/R11)
+		const float y = -glm::degrees(std::atan2(R[2][0], R[2][2])); //arctan(R02/R22)
+		const glm::vec3 primary(x, y, z);
+
+		if (!m_HasEulerHint) return primary; //从未编辑过,没参考点
+	
+		//有两组候选，分别是primary和翻转值，各自按分量360°吸附到旧hint
+		const glm::vec3 flip(180.0f - primary.x, primary.y + 180.0f, primary.z + 180.0f);
+
+		const glm::vec3 a = glm::vec3(ToNearestDegree(primary.x, m_EulerHint.x),
+									  ToNearestDegree(primary.y, m_EulerHint.y),
+									  ToNearestDegree(primary.z, m_EulerHint.z));
+
+		const glm::vec3 b = glm::vec3(ToNearestDegree(flip.x, m_EulerHint.x),
+									  ToNearestDegree(flip.y, m_EulerHint.y),
+									  ToNearestDegree(flip.z, m_EulerHint.z));
+		
+		const glm::vec3 da = a - m_EulerHint;
+		const glm::vec3 db = b - m_EulerHint;
+		return (glm::dot(da, da) <= glm::dot(db, db)) ? a : b; //返回更接近旧hint的那组
+	}
 };
 
