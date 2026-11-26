@@ -33,6 +33,7 @@
 #include "Time/Time.h"
 
 #include "EditorPanel.h"
+#include "DefaultDockLayout.h"
 
 static const float EPS = 1.0f;
 
@@ -215,10 +216,19 @@ int main(void)
         kazuhaRoot->GetTransform().LookAt(camTransform);
         cube->GetTransform().LookAt(camTransform);
 
+
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
-        ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
+
+        //纯哈希,不依赖上下文.是为了下面的几个函数指向同一块区域
+        static const ImGuiID editorDockSpaceID = ImHashStr("EditorDockSpace");
+        //只在从未有过预设时构建一次(首次运行 / 删过 ini / 换过 id)
+        if (ImGui::DockBuilderGetNode(editorDockSpaceID) == nullptr)
+        {
+            DefaultDockLayout::BuildDefaultDockLayout(editorDockSpaceID);
+        }
+        ImGui::DockSpaceOverViewport(editorDockSpaceID, ImGui::GetMainViewport());
 
         EditorPanel::DrawHierarchy(scene);
         EditorPanel::DrawInspector(scene);

@@ -267,7 +267,7 @@ graph TD
 - [x] 阴影映射（Shadow Mapping）
 - [x] 纹理贴图接入（`Texture` 类已封装，`Main.cpp` 中留有示例）
 - [x] 相机自由飞行控制（WASD + 鼠标）
-- [ ] 完成对ImGUI各窗口排布的预设
+- [x] 完成对ImGUI各窗口排布的预设
 - [ ] 修复方向光阴影和光源位置有关的问题（正确应为无关）(修复思路应该是LightComponent的GetLightViewMatrix的pos应该为相机视锥最小包围球的球心)
 - [ ] 修复Hierarchy的？？问题（可能是中文乱码）
 - [ ] 完成各Component在Inspector里的自绘制
