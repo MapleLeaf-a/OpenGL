@@ -3,26 +3,28 @@
     "tasks": [
         {
             "label": "CMake: 配置",
-            "type": "process",
-            "command": "cmake",
+            "type": "shell",
+            "command": "cmd.exe",
             "args": [
-                "-S", "${workspaceFolder}",
-                "-B", "${workspaceFolder}\\build\\cmake-build"
+                "/c",
+                "cmake -S \"${workspaceFolder}\" -B \"${workspaceFolder}\\build\\cmake-build\""
             ],
             "problemMatcher": [],
             "detail": "配置 CMake 工程（自动递归收集源文件与 include 目录，移动/新增文件无需改配置）",
             "options": {
-                "cwd": "${workspaceFolder}"
+                "cwd": "${workspaceFolder}",
+                "shell": {
+                    "executable": "cmd.exe"
+                }
             }
         },
         {
             "label": "CMake: 构建 Release",
-            "type": "process",
-            "command": "cmake",
+            "type": "shell",
+            "command": "cmd.exe",
             "args": [
-                "--build", "${workspaceFolder}\\build\\cmake-build",
-                "--config", "Release",
-                "--parallel"
+                "/c",
+                "cmake --build \"${workspaceFolder}\\build\\cmake-build\" --config Release --parallel"
             ],
             "dependsOn": "CMake: 配置",
             "problemMatcher": ["$msCompile"],
@@ -32,7 +34,10 @@
             },
             "detail": "构建到 build/cmake-build/Release/OpenGL.exe",
             "options": {
-                "cwd": "${workspaceFolder}"
+                "cwd": "${workspaceFolder}",
+                "shell": {
+                    "executable": "cmd.exe"
+                }
             }
         }
     ]
